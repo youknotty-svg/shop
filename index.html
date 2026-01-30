@@ -10,11 +10,11 @@
         :root {
             --bg: #000000;
             --card-bg: #1c1c1e;
-            --item-bg: #000000;
             --text: #ffffff;
             --text-sec: #8e8e93;
             --accent: #0a84ff;
             --border: #38383a;
+            --danger: #ff453a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -23,7 +23,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding-bottom: 80px; /* Уменьшил отступ снизу */
+            padding-bottom: 80px;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -38,7 +38,7 @@
 
         .search-wrap { position: relative; width: 100%; }
         .search-input {
-            width: 100%; padding: 8px 36px 8px 32px; /* Более компактный поиск */
+            width: 100%; padding: 8px 36px 8px 32px;
             border-radius: 10px; border: none;
             background: #2c2c2e; color: #fff; font-size: 15px;
         }
@@ -52,16 +52,16 @@
             background: var(--card-bg);
             border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 16px; /* УВЕЛИЧЕННЫЙ ОТСТУП МЕЖДУ КАТЕГОРИЯМИ */
+            margin-bottom: 16px;
         }
 
         .cat-header {
-            padding: 14px 16px; /* Меньше паддинги */
+            padding: 14px 16px;
             display: flex; align-items: center; justify-content: space-between;
             font-size: 17px; font-weight: 600;
             cursor: pointer;
             background: var(--card-bg);
-            border-bottom: 1px solid transparent; /* Для плавности границ */
+            border-bottom: 1px solid transparent;
         }
         .cat-header:active { background: #2c2c2e; }
         .cat-icon { font-size: 20px; margin-right: 10px; }
@@ -76,12 +76,10 @@
         .sub-container { 
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease-in-out; /* ПЛАВНАЯ АНИМАЦИЯ */
+            transition: max-height 0.4s ease-in-out;
             background: var(--bg);
         }
-        .sub-container.visible {
-            max-height: 2000px; /* Достаточно большое число для раскрытия */
-        }
+        .sub-container.visible { max-height: 3000px; }
 
         /* SUB-CATEGORY */
         .sub-header {
@@ -102,14 +100,12 @@
             transition: max-height 0.3s ease-in-out;
             background: #000;
         }
-        .item-list-wrap.visible {
-            max-height: 1500px;
-        }
+        .item-list-wrap.visible { max-height: 2000px; }
 
-        /* ITEM ROW - COMPACT */
+        /* ITEM ROW */
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 16px; /* Компактные отступы */
+            padding: 8px 16px;
             border-bottom: 1px solid #222;
             min-height: 44px;
         }
@@ -117,45 +113,42 @@
 
         .item-name { font-size: 15px; font-weight: 400; color: #fff; flex: 1; padding-right: 10px; }
 
-        /* CONTROLS - COMPACT & CLEAN */
+        /* CONTROLS - KEYBOARD ONLY */
         .btn-add {
             background: rgba(10, 132, 255, 0.15);
             color: var(--accent);
             border: none;
-            padding: 4px 12px; /* Маленькая кнопка */
+            padding: 4px 12px;
             border-radius: 8px;
             font-weight: 500; font-size: 13px;
             cursor: pointer;
         }
 
-        .counter-wrap {
-            display: flex; align-items: center; gap: 4px;
-            background: #2c2c2e; /* Темный фон для контроллера */
+        .active-controls {
+            display: flex; align-items: center; gap: 6px;
+            background: #2c2c2e;
             border-radius: 8px;
-            padding: 2px;
+            padding: 2px 4px;
         }
-
-        .btn-mini {
-            width: 28px; height: 28px; /* Маленькие кнопки +/- */
-            border-radius: 6px; border: none;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; font-weight: 500;
-            cursor: pointer; background: transparent; color: var(--accent);
-        }
-        .btn-mini:active { background: rgba(255,255,255,0.1); }
-        .btn-mini.minus { color: #ff453a; }
 
         .val-display {
-            min-width: 30px; text-align: center;
+            min-width: 40px; text-align: center;
             font-size: 14px; font-weight: 600; color: #fff;
+            padding: 4px 6px;
             cursor: pointer;
+            border-radius: 4px;
         }
+        .val-display:active { background: rgba(255,255,255,0.1); }
 
-        .btn-comment {
-            font-size: 16px; background: transparent; border: none; 
-            padding: 4px; opacity: 0.3; margin-right: 4px; filter: grayscale(1);
+        .btn-icon {
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            border: none; background: transparent;
+            font-size: 16px; cursor: pointer;
         }
-        .btn-comment.active { opacity: 1; filter: none; }
+        .btn-comment { color: #8e8e93; font-size: 14px; }
+        .btn-comment.active { color: var(--accent); }
+        .btn-del { color: var(--danger); font-size: 18px; font-weight: 300; }
 
         /* CART BAR */
         .cart-bar {
@@ -216,10 +209,9 @@
         <div id="accordionView"></div>
     </div>
 
-    <!-- Cart Bar -->
     <div class="cart-bar" id="cartBar">
         <div class="cart-info" id="cartCount">0 поз.</div>
-        <button class="btn-checkout" onclick="openOrderModal()">В корзину</button>
+        <button class="btn-checkout" onclick="openOrderModal()">Корзина</button>
     </div>
 
     <!-- Input Modal -->
@@ -550,11 +542,10 @@
 
                     if(isSingle) {
                         const wrapper = document.createElement('div');
-                        wrapper.className = 'item-list-wrap visible'; // Always visible if single
+                        wrapper.className = 'item-list-wrap visible';
                         wrapper.id = `list-${catKey}-${subKey}`;
-                        wrapper.style.maxHeight = 'none'; // No anim for static list
+                        wrapper.style.maxHeight = 'none';
                         subCont.appendChild(wrapper);
-                        // Add items immediately
                         sub.items.forEach(item => wrapper.appendChild(createItemRow(item)));
                     } else {
                         const group = document.createElement('div');
@@ -601,14 +592,14 @@
         let controls = '';
 
         if (q === 0) {
-            controls = `<button class="btn-add" onclick="addItem('${i.id}')">Добавить</button>`;
+            controls = `<button class="btn-add" onclick="openInput('${i.id}')">Добавить</button>`;
         } else {
+            // Кнопки + и - убраны. Только клик по числу и крестик.
             controls = `
-                <div class="counter-wrap">
-                    <button class="btn-comment ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>
-                    <button class="btn-mini minus" onclick="changeQty('${i.id}', -1)">−</button>
+                <div class="active-controls">
+                    <button class="btn-icon btn-comment ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>
                     <div class="val-display" onclick="openInput('${i.id}')">${q}</div>
-                    <button class="btn-mini plus" onclick="changeQty('${i.id}', 1)">+</button>
+                    <button class="btn-icon btn-del" onclick="removeItem('${i.id}')">×</button>
                 </div>
             `;
         }
@@ -620,12 +611,24 @@
     }
 
     // ACTIONS
-    window.addItem = (id) => { cart[id] = 1; refreshItem(id); }
-    window.changeQty = (id, delta) => {
-        const curr = cart[id] || 0;
-        const next = curr + delta;
-        if(next <= 0) { delete cart[id]; delete comments[id]; } 
-        else cart[id] = next;
+    window.openInput = (id) => {
+        curItem = id;
+        const i = allItems.find(x => x.id == id);
+        document.getElementById('inputName').innerText = `${i.name} (${i.u})`;
+        document.getElementById('sysInput').value = cart[id] || '';
+        openModal('inputModal');
+        setTimeout(()=>document.getElementById('sysInput').focus(),100);
+    }
+
+    window.saveInput = () => {
+        const val = parseFloat(document.getElementById('sysInput').value);
+        if(val > 0) cart[curItem] = val;
+        else { delete cart[curItem]; delete comments[curItem]; }
+        refreshItem(curItem); closeModal('inputModal');
+    }
+
+    window.removeItem = (id) => {
+        delete cart[id]; delete comments[id];
         refreshItem(id);
     }
 
@@ -642,25 +645,8 @@
         const count = Object.keys(cart).length;
         const bar = document.getElementById('cartBar');
         document.getElementById('cartCount').innerText = `${count} поз.`;
-
         if(count > 0) bar.classList.add('visible'); 
         else bar.classList.remove('visible');
-    }
-
-    window.openInput = (id) => {
-        curItem = id;
-        const i = allItems.find(x => x.id == id);
-        document.getElementById('inputName').innerText = `${i.name} (${i.u})`;
-        document.getElementById('sysInput').value = cart[id];
-        openModal('inputModal');
-        setTimeout(()=>document.getElementById('sysInput').focus(),100);
-    }
-
-    window.saveInput = () => {
-        const val = parseFloat(document.getElementById('sysInput').value);
-        if(val > 0) cart[curItem] = val;
-        else { delete cart[curItem]; delete comments[curItem]; }
-        refreshItem(curItem); closeModal('inputModal');
     }
 
     window.openComment = (id) => {
@@ -694,7 +680,10 @@
                         <div style="font-size:14px;">${i.name}</div>
                         ${comHtml}
                     </div>
-                    <div style="font-size:14px; font-weight:700;">${cart[i.id]} ${i.u}</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="font-size:14px; font-weight:700;">${cart[i.id]} ${i.u}</div>
+                        <div style="color:#ff453a; font-size:18px; cursor:pointer;" onclick="removeItem('${i.id}'); openOrderModal();">×</div>
+                    </div>
                 `;
                 list.appendChild(row);
             }
