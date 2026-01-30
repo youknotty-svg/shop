@@ -207,27 +207,53 @@
             font-weight: 700;
         }
 
-        /* Product Card */
+        /* Product Card - ИСПРАВЛЕНО: фиксированная структура */
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
             border: 1px solid var(--border);
+            min-height: 110px; /* Фиксированная минимальная высота */
         }
 
         .product-header {
             display: flex;
             justify-content: space-between;
             gap: 12px;
+            align-items: flex-start;
         }
         .product-info { flex: 1; }
-        .product-name { font-size: 16px; font-weight: 600; line-height: 1.3; margin-bottom: 4px; }
-        .product-meta { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-        .product-price { color: var(--accent); font-weight: 700; }
-        .product-unit { color: var(--text-sec); }
+        .product-name { 
+            font-size: 15px; 
+            font-weight: 600; 
+            line-height: 1.3; 
+            margin-bottom: 6px;
+            /* Ограничение в 2 строки чтобы не прыгало */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .product-meta { 
+            display: flex; 
+            align-items: baseline; 
+            gap: 6px; 
+            font-size: 14px;
+            margin-top: auto; /* Прижимаем вниз */
+        }
+        .product-price { color: var(--accent); font-weight: 700; font-size: 16px; }
+        .product-unit { color: var(--text-sec); font-size: 12px; }
+
+        /* Кнопки управления - всегда одинаковые по размеру */
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            min-width: 70px;
+        }
 
         .btn-add {
             padding: 8px 18px;
@@ -236,7 +262,7 @@
             color: #5ac8fa;
             border: none;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
             white-space: nowrap;
         }
 
@@ -247,31 +273,43 @@
             border-radius: 18px;
             padding: 4px;
             border: 1px solid var(--accent);
-            gap: 4px;
+            gap: 2px;
         }
         .counter button {
             background: transparent;
             border: none;
             color: var(--accent);
-            width: 28px;
+            width: 26px;
             height: 24px;
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .counter-val { font-weight: 700; font-size: 14px; min-width: 20px; text-align: center; }
+        .counter-val { 
+            font-weight: 700; 
+            font-size: 14px; 
+            min-width: 24px; 
+            text-align: center; 
+        }
 
-        .comment-field {
-            display: none;
-            animation: slideDown 0.2s;
+        /* Кнопка комментария - маленькая иконка */
+        .btn-comment {
+            background: rgba(118, 118, 128, 0.24);
+            border: none;
+            color: var(--text-sec);
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            font-size: 16px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .comment-field.visible { display: block; }
-        .comment-input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
-            color: var(--text);
-            font-size: 14px;
+        .btn-comment.active { 
+            background: rgba(36, 129, 204, 0.2); 
+            color: var(--accent); 
         }
 
         /* Alphabet Index */
@@ -343,6 +381,29 @@
             animation: slideUp 0.3s;
         }
         .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+        
+        /* Comment Modal */
+        .comment-modal-body {
+            padding: 20px 0;
+        }
+        .comment-label {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .comment-textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            font-size: 16px;
+            min-height: 100px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
         .order-item {
             padding: 12px 0;
             border-bottom: 1px solid var(--border);
@@ -362,7 +423,7 @@
             margin: 20px 0;
             font-family: inherit;
         }
-        .modal-buttons { display: flex; gap: 12px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn-modal {
             flex: 1;
             padding: 16px;
@@ -374,7 +435,6 @@
         .btn-confirm { background: var(--accent); color: #fff; }
         .btn-cancel { background: #3a3a3c; color: #fff; }
 
-        @keyframes slideDown { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1;} }
         @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
         .empty { text-align: center; color: var(--text-sec); padding: 60px 20px; font-size: 16px; }
@@ -422,6 +482,21 @@
         <button class="btn-checkout" onclick="openOrderModal()">Оформить</button>
     </div>
 
+    <!-- Comment Modal -->
+    <div class="modal" id="commentModal">
+        <div class="modal-content">
+            <div class="modal-title">Комментарий</div>
+            <div class="comment-modal-body">
+                <div class="comment-label" id="commentProductName"></div>
+                <textarea class="comment-textarea" id="commentTextarea" placeholder="Например: только спелые, крупные..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-modal btn-cancel" onclick="closeCommentModal()">Отмена</button>
+                <button class="btn-modal btn-confirm" onclick="saveCommentFromModal()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Order Modal -->
     <div class="modal" id="orderModal">
         <div class="modal-content">
@@ -441,7 +516,7 @@
     tg.setHeaderColor('#1c1c1e');
     tg.setBackgroundColor('#0f0f0f');
 
-    // === DATABASE with Subcategories ===
+    // === DATABASE === (твоя база данных остаётся той же)
     const DB = {
   "veg": {
     "name": "🥦 Овощи",
@@ -597,6 +672,7 @@
     let priceFilter = 'all';
     let allItems = [];
     let fuse;
+    let currentCommentItemId = null;
 
     // Build flat items list
     function buildItemsList() {
@@ -676,7 +752,6 @@
         const c = document.getElementById('content');
         
         if (cat.subs) {
-            // Show subcategories
             c.innerHTML = `
                 <div class="section-title">${cat.name}</div>
                 <div class="category-grid" id="subGrid"></div>
@@ -694,7 +769,6 @@
                 subGrid.appendChild(card);
             });
         } else {
-            // Show items
             renderItems(cat.items);
         }
 
@@ -730,7 +804,6 @@
             return;
         }
 
-        // Group by first letter
         const grouped = {};
         filtered.forEach(item => {
             const letter = item.name[0].toUpperCase();
@@ -754,7 +827,6 @@
             c.appendChild(grid);
         });
 
-        // Alphabet index
         renderAlphabetIndex(Object.keys(grouped).sort());
     }
 
@@ -782,13 +854,13 @@
         return card;
     }
 
-    // === PRODUCT CARD ===
+    // === PRODUCT CARD (исправленный - без инлайн комментария) ===
     function createProductCard(item) {
         const card = document.createElement('div');
         card.className = 'product-card';
         
         const qty = cart[item.id] || 0;
-        const comment = comments[item.id] || '';
+        const hasComment = comments[item.id] && comments[item.id].trim().length > 0;
         
         card.innerHTML = `
             <div class="product-header">
@@ -799,12 +871,12 @@
                         <span class="product-unit">/ ${item.unit}</span>
                     </div>
                 </div>
-                <div id="btn-${item.id}">
-                    ${qty > 0 ? getCounterHtml(item.id, qty) : `<button class="btn-add" onclick="addItem('${item.id}')">+</button>`}
+                <div class="product-actions">
+                    <div id="btn-${item.id}">
+                        ${qty > 0 ? getCounterHtml(item.id, qty) : `<button class="btn-add" onclick="addItem('${item.id}')">+</button>`}
+                    </div>
+                    ${qty > 0 ? `<button class="btn-comment ${hasComment?'active':''}" onclick="openCommentModal('${item.id}')">💬</button>` : ''}
                 </div>
-            </div>
-            <div class="comment-field ${qty>0?'visible':''}" id="com-${item.id}">
-                <input type="text" class="comment-input" placeholder="Комментарий..." value="${comment}" oninput="saveComment('${item.id}', this.value)">
             </div>
         `;
         return card;
@@ -835,29 +907,21 @@
         updateUI(id);
     };
 
-    window.saveComment = function(id, val) {
-        if (val) comments[id] = val;
-        else delete comments[id];
-    };
-
     function updateUI(id) {
-        const btn = document.getElementById(`btn-${id}`);
-        const com = document.getElementById(`com-${id}`);
+        // Перерендериваем только карточку которая изменилась
+        const item = allItems.find(i => i.id === id);
+        if (!item) return;
         
-        if (btn) {
-            const qty = cart[id] || 0;
-            if (qty > 0) {
-                btn.innerHTML = getCounterHtml(id, qty);
-                if (com) com.classList.add('visible');
-            } else {
-                btn.innerHTML = `<button class="btn-add" onclick="addItem('${id}')">+</button>`;
-                if (com) com.classList.remove('visible');
-            }
+        // Находим карточку в DOM
+        const card = document.getElementById(`btn-${id}`)?.closest('.product-card');
+        if (card) {
+            const newCard = createProductCard(item);
+            card.replaceWith(newCard);
         }
         
         updateBottomCart();
         
-        // Re-render if on home to update category counters
+        // Re-render categories if on home
         if (currentView === 'home') {
             const catGrid = document.getElementById('categoryGrid');
             if (catGrid) {
@@ -898,6 +962,30 @@
     function declension(n, forms) {
         return forms[n%10===1 && n%100!==11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
     }
+
+    // === COMMENT MODAL ===
+    window.openCommentModal = function(id) {
+        currentCommentItemId = id;
+        const item = allItems.find(i => i.id === id);
+        document.getElementById('commentProductName').innerText = item.name;
+        document.getElementById('commentTextarea').value = comments[id] || '';
+        document.getElementById('commentModal').classList.add('visible');
+    };
+
+    window.closeCommentModal = function() {
+        document.getElementById('commentModal').classList.remove('visible');
+    };
+
+    window.saveCommentFromModal = function() {
+        const val = document.getElementById('commentTextarea').value.trim();
+        if (val) {
+            comments[currentCommentItemId] = val;
+        } else {
+            delete comments[currentCommentItemId];
+        }
+        updateUI(currentCommentItemId);
+        closeCommentModal();
+    };
 
     // === BREADCRUMBS ===
     function updateBreadcrumbs(crumbs) {
@@ -1020,7 +1108,7 @@
             if (cart[i.id]) {
                 const row = document.createElement('div');
                 row.className = 'order-item';
-                const note = comments[i.id] ? `<div class="order-note">✏️ ${comments[i.id]}</div>` : '';
+                const note = comments[i.id] ? `<div class="order-note">💬 ${comments[i.id]}</div>` : '';
                 row.innerHTML = `
                     <div>
                         <div style="font-weight:600;">${i.name}</div>
