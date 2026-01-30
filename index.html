@@ -3,360 +3,587 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Магазин</title>
+    <title>Fresh Market 2026</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: var(--tg-theme-bg-color, #fff);
-            --text-color: var(--tg-theme-text-color, #000);
-            --hint-color: var(--tg-theme-hint-color, #999);
-            --link-color: var(--tg-theme-link-color, #2481cc);
-            --button-color: var(--tg-theme-button-color, #2481cc);
-            --button-text: var(--tg-theme-button-text-color, #fff);
-            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            --primary: #34c759; /* Apple Green */
+            --bg-grad-1: #e0f2f1;
+            --bg-grad-2: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #1c1c1e;
+            --text-sec: #8e8e93;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-grad-1: #000000;
+                --bg-grad-2: #1c1c1e;
+                --glass-bg: rgba(30, 30, 30, 0.75);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --text-main: #ffffff;
+                --text-sec: #8e8e93;
+            }
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
             margin: 0;
             padding: 0;
-            background-color: var(--secondary-bg);
-            color: var(--text-color);
-            padding-bottom: 80px; /* Место для скролла */
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 120px; /* Space for FAB */
         }
 
-        /* Навигация (Табы) */
-        .tabs {
-            display: flex;
-            overflow-x: auto;
-            background: var(--bg-color);
-            padding: 10px;
+        /* === HEADER & SEARCH === */
+        .header {
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        .tab {
-            padding: 8px 16px;
-            margin-right: 10px;
-            border-radius: 20px;
-            background: var(--secondary-bg);
-            color: var(--text-color);
-            white-space: nowrap;
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-        .tab.active {
-            background: var(--button-color);
-            color: var(--button-text);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 16px;
         }
 
-        /* Секции */
-        .section-title {
-            padding: 15px 15px 5px;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--hint-color);
-            text-transform: uppercase;
-        }
-
-        /* Сетка товаров */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 колонки */
-            gap: 10px;
-            padding: 10px;
-        }
-
-        .card {
-            background: var(--bg-color);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        .search-box {
             position: relative;
-        }
-
-        .card-name {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-
-        .card-price {
-            font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 8px;
-        }
-        .card-unit {
-            font-size: 12px;
-            color: var(--hint-color);
-            font-weight: normal;
-        }
-
-        /* Кнопки управления */
-        .btn-add {
             width: 100%;
-            padding: 8px;
-            background: var(--secondary-bg);
-            color: var(--button-color);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border-radius: 12px;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
+            background: rgba(118, 118, 128, 0.12);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
         }
         
+        .search-input:focus { background: rgba(118, 118, 128, 0.2); }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-sec);
+            pointer-events: none;
+        }
+
+        /* === CATEGORY TABS === */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 12px 16px;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(118, 118, 128, 0.12);
+            color: var(--text-main);
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+        }
+
+        /* === PRODUCT GRID === */
+        .container {
+            padding: 0 16px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 24px 0 12px;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr; /* List view on mobile looks better for long names */
+            gap: 12px;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(4px);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .card:active { transform: scale(0.98); }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-info { flex: 1; padding-right: 12px; }
+        .card-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+        .card-price { color: var(--primary); font-weight: 700; font-size: 15px; }
+        .card-unit { font-size: 13px; color: var(--text-sec); font-weight: 400; }
+
+        /* Controls */
+        .btn-add {
+            background: rgba(118, 118, 128, 0.1);
+            color: var(--primary);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
         .counter {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: var(--button-color);
-            border-radius: 8px;
-            padding: 4px;
-            color: var(--button-text);
+            background: var(--primary);
+            border-radius: 20px;
+            padding: 2px;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3);
         }
+        
         .counter button {
             background: none;
             border: none;
             color: #fff;
+            width: 32px;
+            height: 28px;
             font-size: 18px;
-            width: 30px;
-            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
         }
-        .count-val {
-            font-size: 14px;
-            font-weight: 600;
+        
+        .counter span { font-weight: 600; font-size: 14px; min-width: 20px; text-align: center; }
+
+        /* Comments */
+        .comment-box {
+            margin-top: 10px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        .comment-box.visible { display: block; }
+        
+        .comment-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(118, 118, 128, 0.08);
+            color: var(--text-main);
+            font-size: 13px;
+            outline: none;
         }
 
-        .hidden { display: none; }
+        /* Order Comment */
+        .order-comment-section {
+            margin: 30px 16px;
+            background: var(--glass-bg);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .order-comment-title { font-weight: 600; margin-bottom: 8px; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="tabs" id="tabs">
-        <!-- Табы генерятся JS -->
+    <!-- Header -->
+    <div class="header">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="search" placeholder="Поиск (например: авокадо)...">
+        </div>
     </div>
 
-    <div id="content">
-        <!-- Товары генерятся JS -->
+    <!-- Tabs -->
+    <div class="tabs" id="tabs"></div>
+
+    <!-- Content -->
+    <div id="content" class="container"></div>
+
+    <!-- Order Comment -->
+    <div class="order-comment-section hidden" id="orderCommentBlock">
+        <div class="order-comment-title">💬 Комментарий к заказу (общий)</div>
+        <textarea class="comment-input" id="globalComment" rows="2" placeholder="Например: Позвоните за час..."></textarea>
     </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // На весь экран
-
-    // === БАЗА ДАННЫХ (Взята из твоего списка) ===
-    const DATABASE = [
-        {
-            id: "veg", name: "🥦 Овощи", items: [
-                {id: "v_tom_kr", name: "🍅 Томат Краснодар", price: 410, unit: "кг"},
-                {id: "v_tom_uz", name: "🍅 Томат Узбекистан", price: 780, unit: "кг"},
-                {id: "v_tom_ch", name: "🍅 Томат Черри кр.", price: 840, unit: "кг"},
-                {id: "v_pot", name: "🥔 Картофель мытый", price: 63, unit: "кг"},
-                {id: "v_cuc", name: "🥒 Огурцы Баку", price: 520, unit: "кг"},
-                {id: "v_cab", name: "🥬 Капуста мол.", price: 126, unit: "кг"},
-                {id: "v_pep", name: "🌶 Перец Болгарский", price: 265, unit: "кг"},
-                {id: "v_car", name: "🥕 Морковь мытая", price: 65, unit: "кг"},
-                {id: "v_oni", name: "🧅 Лук репчатый", price: 44, unit: "кг"},
-                {id: "v_gar", name: "🧄 Чеснок", price: 266, unit: "кг"},
-                {id: "v_zub", name: "🍆 Баклажан", price: 175, unit: "кг"},
-                {id: "v_kab", name: "🥒 Кабачок", price: 475, unit: "кг"},
-                {id: "v_rad", name: "🔴 Редис", price: 210, unit: "кг"},
-                {id: "v_avoc", name: "🥑 Авокадо Хасс", price: 630, unit: "кг"}
-            ]
-        },
-        {
-            id: "grn", name: "🌿 Зелень", items: [
-                {id: "g_dill", name: "Укроп", price: 290, unit: "кг"},
-                {id: "g_petr", name: "Петрушка", price: 280, unit: "кг"},
-                {id: "g_kinz", name: "Кинза", price: 630, unit: "кг"},
-                {id: "g_onion", name: "Лук зеленый", price: 700, unit: "кг"},
-                {id: "g_spin", name: "Шпинат", price: 770, unit: "кг"},
-                {id: "g_sal_rom", name: "Салат Романо", price: 215, unit: "кг"},
-                {id: "g_sal_ice", name: "Салат Айсберг", price: 265, unit: "кг"},
-                {id: "g_ruk", name: "Руккола", price: 1650, unit: "кг"},
-                {id: "g_baz", name: "Базилик", price: 2240, unit: "кг"},
-                {id: "g_mint", name: "Мята", price: 1250, unit: "кг"}
-            ]
-        },
-        {
-            id: "fru", name: "🍎 Фрукты", items: [
-                {id: "f_app", name: "Яблоки Голден", price: 210, unit: "кг"},
-                {id: "f_pea", name: "Груша Конференц", price: 395, unit: "кг"},
-                {id: "f_ban", name: "Банан", price: 175, unit: "кг"},
-                {id: "f_ora", name: "Апельсин", price: 145, unit: "кг"},
-                {id: "f_man", name: "Мандарин", price: 235, unit: "кг"},
-                {id: "f_lem", name: "Лимон", price: 345, unit: "кг"},
-                {id: "f_kiw", name: "Киви", price: 175, unit: "кг"},
-                {id: "f_mango", name: "Манго Египет", price: 755, unit: "кг"},
-                {id: "f_vin", name: "Виноград б/к", price: 560, unit: "кг"},
-                {id: "f_gran", name: "Гранат", price: 420, unit: "кг"}
-            ]
-        },
-        {
-            id: "ber", name: "🍓 Ягоды", items: [
-                {id: "b_str", name: "Клубника", price: 1450, unit: "кг"},
-                {id: "b_blu", name: "Голубика", price: 1850, unit: "кг"},
-                {id: "b_mal", name: "Малина", price: 3420, unit: "кг"},
-                {id: "b_eje", name: "Ежевика", price: 5600, unit: "кг"}
-            ]
-        },
-        {
-            id: "mus", name: "🍄 Грибы", items: [
-                {id: "m_sha", name: "Шампиньоны", price: 310, unit: "кг"},
-                {id: "m_ves", name: "Вешенки", price: 585, unit: "кг"}
-            ]
-        }
-    ];
+    tg.expand();
+    
+    // === DATA ===
+    // Полный список с ID, который мы сгенерировали
+    const DB = [
+  {
+    "id": "veg",
+    "name": "🥦 Овощи",
+    "items": [
+      {"id": "art_gr", "name": "Артишоки зеленые", "price": 2320, "unit": "кг"},
+      {"id": "art_vi", "name": "Артишоки фиолетовые", "price": 2320, "unit": "кг"},
+      {"id": "bakl", "name": "Баклажан", "price": 175, "unit": "кг"},
+      {"id": "bakl_gr", "name": "Баклажан грунтовой", "price": 196, "unit": "кг"},
+      {"id": "pep_yel", "name": "Болгарский перец желтый", "price": 255, "unit": "кг"},
+      {"id": "pep_grn", "name": "Болгарский перец зеленый", "price": 235, "unit": "кг"},
+      {"id": "pep_red", "name": "Болгарский перец красный", "price": 265, "unit": "кг"},
+      {"id": "pep_ram", "name": "Перец Рамиро", "price": 575, "unit": "кг"},
+      {"id": "goroh", "name": "Горох стручковый", "price": 2240, "unit": "кг"},
+      {"id": "galan", "name": "Галангал корень", "price": 1820, "unit": "кг"},
+      {"id": "daik", "name": "Дайкон", "price": 126, "unit": "кг"},
+      {"id": "imbir", "name": "Имбирь корень", "price": 495, "unit": "кг"},
+      {"id": "kab_w", "name": "Кабачок белый", "price": 475, "unit": "кг"},
+      {"id": "cab_bk", "name": "Капуста б/к", "price": 38, "unit": "кг"},
+      {"id": "cab_bro", "name": "Капуста брокколи", "price": 345, "unit": "кг"},
+      {"id": "cab_bru", "name": "Капуста брюссельская", "price": 2520, "unit": "кг"},
+      {"id": "cab_kol", "name": "Капуста кольраби", "price": 490, "unit": "кг"},
+      {"id": "cab_red", "name": "Капуста краснокочанная", "price": 105, "unit": "кг"},
+      {"id": "cab_mol", "name": "Капуста молодая", "price": 126, "unit": "кг"},
+      {"id": "cab_pek", "name": "Капуста Пекинская", "price": 77, "unit": "кг"},
+      {"id": "cab_col", "name": "Капуста цветная", "price": 145, "unit": "кг"},
+      {"id": "pot_bat", "name": "Картофель Батат", "price": 210, "unit": "кг"},
+      {"id": "pot_bab", "name": "Картофель бэби", "price": 85, "unit": "кг"},
+      {"id": "pot_gal", "name": "Картофель Гала", "price": 50, "unit": "кг"},
+      {"id": "pot_red", "name": "Картофель мытый красный", "price": 59, "unit": "кг"},
+      {"id": "pot_myt", "name": "Картофель мытый", "price": 63, "unit": "кг"},
+      {"id": "kuk", "name": "Кукуруза свежая", "price": 0, "unit": "кг"},
+      {"id": "luk_wh", "name": "Лук белый", "price": 126, "unit": "кг"},
+      {"id": "luk_gr", "name": "Лук зеленый", "price": 700, "unit": "кг"},
+      {"id": "luk_red", "name": "Лук красный", "price": 65, "unit": "кг"},
+      {"id": "luk_yal", "name": "Лук крымский", "price": 115, "unit": "кг"},
+      {"id": "luk_por", "name": "Лук порей", "price": 420, "unit": "кг"},
+      {"id": "luk_rep", "name": "Лук репчатый", "price": 44, "unit": "кг"},
+      {"id": "luk_sha", "name": "Лук шалот", "price": 420, "unit": "кг"},
+      {"id": "mor_myt", "name": "Морковь мытая", "price": 65, "unit": "кг"},
+      {"id": "mor_ros", "name": "Морковь Россия", "price": 48, "unit": "кг"},
+      {"id": "cuc_bak", "name": "Огурцы бакинские", "price": 520, "unit": "кг"},
+      {"id": "cuc_lng", "name": "Огурец длинноплодный", "price": 475, "unit": "кг"},
+      {"id": "cuc_kur", "name": "Огурцы Кураж", "price": 395, "unit": "кг"},
+      {"id": "past", "name": "Пастернак", "price": 565, "unit": "кг"},
+      {"id": "chil_gr", "name": "Перец Чили зеленый", "price": 490, "unit": "кг"},
+      {"id": "chil_rd", "name": "Перец Чили красный", "price": 490, "unit": "кг"},
+      {"id": "rad_red", "name": "Редис красный", "price": 210, "unit": "кг"},
+      {"id": "red_arb", "name": "Редька арбузная", "price": 350, "unit": "кг"},
+      {"id": "repa", "name": "Репа", "price": 85, "unit": "кг"},
+      {"id": "svek", "name": "Свекла", "price": 49, "unit": "кг"},
+      {"id": "seld_ko", "name": "Корень сельдерея", "price": 195, "unit": "кг"},
+      {"id": "seld_st", "name": "Стебель сельдерея", "price": 165, "unit": "кг"},
+      {"id": "spar", "name": "Спаржа зеленая", "price": 2250, "unit": "кг"},
+      {"id": "tom_kra", "name": "Томат Краснодар", "price": 410, "unit": "кг"},
+      {"id": "tom_yel", "name": "Томат желтый", "price": 560, "unit": "кг"},
+      {"id": "tom_slv", "name": "Томат красный сливка", "price": 295, "unit": "кг"},
+      {"id": "tom_uzb", "name": "Томат Узбекистан", "price": 780, "unit": "кг"},
+      {"id": "tom_aze", "name": "Томат Азербайджан", "price": 425, "unit": "кг"},
+      {"id": "tom_dag", "name": "Томат Дагестан", "price": 385, "unit": "кг"},
+      {"id": "tom_che", "name": "Томат черри кр", "price": 840, "unit": "кг"},
+      {"id": "tom_kum", "name": "Томат кумато", "price": 560, "unit": "кг"},
+      {"id": "topin", "name": "Топинамбур", "price": 420, "unit": "кг"},
+      {"id": "tyk_bat", "name": "Тыква Баттернат", "price": 49, "unit": "кг"},
+      {"id": "fasol", "name": "Фасоль стручковая", "price": 2450, "unit": "кг"},
+      {"id": "fenhel", "name": "Фенхель", "price": 495, "unit": "кг"},
+      {"id": "hren", "name": "Хрен корень", "price": 2100, "unit": "кг"},
+      {"id": "zuk", "name": "Цуккини зеленые", "price": 425, "unit": "кг"},
+      {"id": "ches", "name": "Чеснок", "price": 266, "unit": "кг"}
+    ]
+  },
+  {
+    "id": "grn",
+    "name": "🌿 Зелень",
+    "items": [
+      {"id": "baz_gr", "name": "Базилик зеленый", "price": 2240, "unit": "кг"},
+      {"id": "baz_rd", "name": "Базилик красный", "price": 3250, "unit": "кг"},
+      {"id": "kerv", "name": "Кервель", "price": 1400, "unit": "кг"},
+      {"id": "kinza", "name": "Кинза", "price": 630, "unit": "кг"},
+      {"id": "lemon", "name": "Лемонграсс", "price": 1270, "unit": "кг"},
+      {"id": "list_ba", "name": "Лист бамбука", "price": 585, "unit": "кг"},
+      {"id": "list_bn", "name": "Лист банана", "price": 1960, "unit": "кг"},
+      {"id": "myata", "name": "Мята свежая", "price": 1250, "unit": "кг"},
+      {"id": "petr", "name": "Петрушка", "price": 280, "unit": "кг"},
+      {"id": "rozm", "name": "Розмарин", "price": 1120, "unit": "кг"},
+      {"id": "sal_ice", "name": "Салат Айсберг", "price": 265, "unit": "кг"},
+      {"id": "sal_lat", "name": "Салат латук", "price": 180, "unit": "кг"},
+      {"id": "sal_rom", "name": "Салат Романо", "price": 215, "unit": "кг"},
+      {"id": "sal_ruk", "name": "Салат Руккола", "price": 1650, "unit": "кг"},
+      {"id": "tim", "name": "Тимьян", "price": 2240, "unit": "кг"},
+      {"id": "ukr", "name": "Укроп", "price": 290, "unit": "кг"},
+      {"id": "spin", "name": "Шпинат", "price": 770, "unit": "кг"},
+      {"id": "shav", "name": "Щавель", "price": 840, "unit": "кг"},
+      {"id": "estr", "name": "Эстрагон", "price": 3650, "unit": "кг"},
+      {"id": "mic_gor", "name": "Микрозелень горох", "price": 350, "unit": "уп"},
+      {"id": "mic_baz", "name": "Микрозелень Базилик", "price": 425, "unit": "уп"}
+    ]
+  },
+  {
+    "id": "fru",
+    "name": "🍎 Фрукты",
+    "items": [
+      {"id": "avo", "name": "Авокадо", "price": 585, "unit": "кг"},
+      {"id": "avo_has", "name": "Авокадо Хасс", "price": 630, "unit": "кг"},
+      {"id": "anan", "name": "Ананас Голд", "price": 295, "unit": "кг"},
+      {"id": "apel", "name": "Апельсин", "price": 145, "unit": "кг"},
+      {"id": "aiva", "name": "Айва", "price": 355, "unit": "кг"},
+      {"id": "banan", "name": "Банан", "price": 175, "unit": "кг"},
+      {"id": "vin_wh", "name": "Виноград белый б/к", "price": 560, "unit": "кг"},
+      {"id": "vin_rd", "name": "Виноград красный б/к", "price": 685, "unit": "кг"},
+      {"id": "gran", "name": "Гранат", "price": 420, "unit": "кг"},
+      {"id": "grape", "name": "Грейпфрут", "price": 196, "unit": "кг"},
+      {"id": "gru_con", "name": "Груша конференция", "price": 395, "unit": "кг"},
+      {"id": "kiwi", "name": "Киви", "price": 175, "unit": "кг"},
+      {"id": "kum", "name": "Кумкват", "price": 2650, "unit": "кг"},
+      {"id": "lime", "name": "Лайм", "price": 465, "unit": "кг"},
+      {"id": "limon", "name": "Лимон", "price": 345, "unit": "кг"},
+      {"id": "mango", "name": "Манго Египет", "price": 755, "unit": "кг"},
+      {"id": "mand", "name": "Мандарин", "price": 235, "unit": "кг"},
+      {"id": "mara", "name": "Маракуйя", "price": 1250, "unit": "кг"},
+      {"id": "papa", "name": "Папайя", "price": 2240, "unit": "кг"},
+      {"id": "pita", "name": "Питахайя", "price": 770, "unit": "кг"},
+      {"id": "pomelo", "name": "Помело", "price": 285, "unit": "кг"},
+      {"id": "sliva", "name": "Слива черная", "price": 484, "unit": "кг"},
+      {"id": "fei", "name": "Фейхоа", "price": 1260, "unit": "кг"},
+      {"id": "hurma", "name": "Хурма", "price": 310, "unit": "кг"},
+      {"id": "yab_gol", "name": "Яблоки Голден", "price": 210, "unit": "кг"},
+      {"id": "yab_gre", "name": "Яблоки Гренни", "price": 182, "unit": "кг"}
+    ]
+  },
+  {
+    "id": "ber",
+    "name": "🍓 Ягоды",
+    "items": [
+      {"id": "golub", "name": "Голубика", "price": 1850, "unit": "кг"},
+      {"id": "eje", "name": "Ежевика", "price": 5600, "unit": "кг"},
+      {"id": "klub", "name": "Клубника", "price": 1450, "unit": "кг"},
+      {"id": "malina", "name": "Малина", "price": 3420, "unit": "кг"},
+      {"id": "smor", "name": "Смородина красная", "price": 5250, "unit": "кг"},
+      {"id": "fiz", "name": "Физалис", "price": 210, "unit": "уп"}
+    ]
+  },
+  {
+    "id": "mus",
+    "name": "🍄 Грибы",
+    "items": [
+      {"id": "vesh", "name": "Вешенки", "price": 585, "unit": "кг"},
+      {"id": "shamp", "name": "Шампиньоны", "price": 310, "unit": "кг"},
+      {"id": "shiit", "name": "Грибы Шиитаки", "price": 1150, "unit": "кг"}
+    ]
+  }
+];
 
     let cart = {}; // {id: quantity}
+    let comments = {}; // {id: text}
+    let activeCat = "veg";
 
-    // Инициализация
     function init() {
         renderTabs();
-        renderContent('veg'); // По умолчанию овощи
+        renderItems(DB[0].items); // Default category
         
-        tg.MainButton.setParams({
-            text: 'ЗАКАЗАТЬ',
-            color: '#2ea64e' // Зеленый цвет
-        });
+        // Listeners
+        document.getElementById('search').addEventListener('input', (e) => doSearch(e.target.value));
+        
+        tg.MainButton.setParams({ color: '#34c759' });
     }
 
-    // Рендер Табов
     function renderTabs() {
-        const container = document.getElementById('tabs');
-        DATABASE.forEach((cat, index) => {
-            let btn = document.createElement('div');
-            btn.className = `tab ${index === 0 ? 'active' : ''}`;
-            btn.innerText = cat.name;
-            btn.onclick = () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                btn.classList.add('active');
-                renderContent(cat.id);
+        const c = document.getElementById('tabs');
+        c.innerHTML = '';
+        DB.forEach((cat, idx) => {
+            let el = document.createElement('div');
+            el.className = `tab ${idx===0?'active':''}`;
+            el.innerText = cat.name;
+            el.onclick = () => {
+                document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+                el.classList.add('active');
+                activeCat = cat.id;
+                document.getElementById('search').value = ''; // clear search
+                renderItems(cat.items);
             };
-            container.appendChild(btn);
+            c.appendChild(el);
         });
     }
 
-    // Рендер Товаров
-    function renderContent(catId) {
-        const container = document.getElementById('content');
-        container.innerHTML = ''; // Очистка
+    function renderItems(items) {
+        const c = document.getElementById('content');
+        c.innerHTML = '';
         
-        // Находим категорию
-        const category = DATABASE.find(c => c.id === catId);
-        
-        // Заголовок
-        let title = document.createElement('div');
-        title.className = 'section-title';
-        title.innerText = category.name;
-        container.appendChild(title);
+        if(items.length === 0) {
+            c.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">Ничего не найдено</div>';
+            return;
+        }
 
-        // Сетка
-        let grid = document.createElement('div');
-        grid.className = 'grid';
-
-        category.items.forEach(prod => {
-            let card = document.createElement('div');
-            card.className = 'card';
+        items.forEach(prod => {
+            let el = document.createElement('div');
+            el.className = 'card';
             
-            // Проверяем корзину
             let qty = cart[prod.id] || 0;
+            let comment = comments[prod.id] || "";
             let priceHtml = prod.price > 0 ? `${prod.price}₽` : 'По запросу';
 
-            card.innerHTML = `
-                <div>
-                    <div class="card-name">${prod.name}</div>
-                    <div class="card-price">${priceHtml} <span class="card-unit">/ ${prod.unit}</span></div>
+            el.innerHTML = `
+                <div class="card-row">
+                    <div class="card-info">
+                        <div class="card-name">${prod.name}</div>
+                        <div><span class="card-price">${priceHtml}</span> <span class="card-unit">/ ${prod.unit}</span></div>
+                    </div>
+                    <div id="btn-${prod.id}">
+                        ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">В корзину</button>`}
+                    </div>
                 </div>
-                <div id="btn-${prod.id}">
-                    ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">Добавить</button>`}
+                
+                <div class="comment-box ${qty > 0 ? 'visible' : ''}" id="com-box-${prod.id}">
+                    <input type="text" class="comment-input" 
+                           placeholder="Комментарий (напр. только спелые)..." 
+                           value="${comment}"
+                           oninput="saveComment('${prod.id}', this.value)">
                 </div>
             `;
-            grid.appendChild(card);
+            c.appendChild(el);
         });
-
-        container.appendChild(grid);
     }
 
     function getCounterHtml(id, qty) {
         return `
             <div class="counter">
                 <button onclick="change('${id}', -1)">−</button>
-                <div class="count-val">${qty}</div>
+                <span>${qty}</span>
                 <button onclick="change('${id}', 1)">+</button>
             </div>
         `;
     }
 
-    // Логика добавления
     window.add = function(id) {
         cart[id] = 1;
-        updateCard(id);
-        updateMainButton();
+        updateUI(id);
     }
 
     window.change = function(id, delta) {
         if (!cart[id]) cart[id] = 0;
         cart[id] += delta;
-        if (cart[id] <= 0) delete cart[id];
-        
-        updateCard(id);
-        updateMainButton();
+        if (cart[id] <= 0) {
+            delete cart[id];
+            delete comments[id]; // удаляем коммент если удалили товар
+        }
+        updateUI(id);
     }
 
-    function updateCard(id) {
-        let btnContainer = document.getElementById(`btn-${id}`);
-        if (btnContainer) {
+    window.saveComment = function(id, val) {
+        if(val) comments[id] = val;
+        else delete comments[id];
+    }
+
+    function updateUI(id) {
+        // Update Card Button
+        let btn = document.getElementById(`btn-${id}`);
+        let comBox = document.getElementById(`com-box-${id}`);
+        
+        if(btn) {
             let qty = cart[id] || 0;
             if (qty > 0) {
-                btnContainer.innerHTML = getCounterHtml(id, qty);
+                btn.innerHTML = getCounterHtml(id, qty);
+                if(comBox) comBox.classList.add('visible');
             } else {
-                btnContainer.innerHTML = `<button class="btn-add" onclick="add('${id}')">Добавить</button>`;
+                btn.innerHTML = `<button class="btn-add" onclick="add('${id}')">В корзину</button>`;
+                if(comBox) comBox.classList.remove('visible');
             }
         }
-    }
-
-    function updateMainButton() {
-        let totalSum = 0;
+        
+        // Update Main Button
+        let total = 0;
         let count = 0;
         
-        // Считаем сумму
-        for (let cat of DATABASE) {
-            for (let prod of cat.items) {
-                if (cart[prod.id]) {
-                    totalSum += prod.price * cart[prod.id];
-                    count += 1;
+        DB.forEach(cat => {
+            cat.items.forEach(p => {
+                if(cart[p.id]) {
+                    total += p.price * cart[p.id];
+                    count++;
                 }
-            }
-        }
+            });
+        });
 
         if (count > 0) {
-            tg.MainButton.setText(`ЗАКАЗАТЬ: ${totalSum}₽`);
+            tg.MainButton.setText(`ЗАКАЗАТЬ (${total}₽)`);
             tg.MainButton.show();
+            document.getElementById('orderCommentBlock').classList.remove('hidden');
         } else {
             tg.MainButton.hide();
+            document.getElementById('orderCommentBlock').classList.add('hidden');
         }
     }
 
-    // Отправка данных боту
-    tg.MainButton.onClick(function() {
-        let dataToSend = {
-            cart: cart,
-            total: tg.MainButton.text // передаем текст кнопки с суммой
-        };
-        tg.sendData(JSON.stringify(dataToSend));
-    });
+    // SEARCH
+    function doSearch(query) {
+        query = query.toLowerCase();
+        
+        // Unselect tabs visual
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        
+        if (!query) {
+            // Restore active tab
+            // For simplicity just render first category or active
+            const activeTabIdx = DB.findIndex(c => c.id === activeCat);
+            document.querySelectorAll('.tab')[activeTabIdx].classList.add('active');
+            renderItems(DB[activeTabIdx].items);
+            return;
+        }
 
+        let results = [];
+        DB.forEach(cat => {
+            cat.items.forEach(p => {
+                if (p.name.toLowerCase().includes(query)) results.push(p);
+            });
+        });
+        
+        renderItems(results);
+    }
+
+    tg.MainButton.onClick(() => {
+        const globalComment = document.getElementById('globalComment').value;
+        const data = {
+            cart: cart,
+            comments: comments,
+            global_comment: globalComment,
+            total_price: tg.MainButton.text
+        };
+        tg.sendData(JSON.stringify(data));
+    });
+    
     init();
 </script>
 </body>
