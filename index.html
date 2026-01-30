@@ -163,94 +163,81 @@
             margin: 20px 0 12px;
         }
 
-        /* НОВЫЙ ДИЗАЙН КАТЕГОРИЙ НА ГЛАВНОЙ */
+        /* КОМПАКТНЫЕ КАТЕГОРИИ НА ГЛАВНОЙ */
         .home-categories {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 16px 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 12px 0;
         }
 
         .home-category-card {
-            background: linear-gradient(135deg, var(--card-bg) 0%, #252527 100%);
-            border-radius: 16px;
-            padding: 24px 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 12px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 16px;
+            text-align: center;
             cursor: pointer;
             border: 1px solid var(--border);
             position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
+            min-height: 100px;
         }
         .home-category-card:active { 
-            transform: scale(0.98); 
-            box-shadow: 0 4px 16px rgba(36, 129, 204, 0.3);
+            transform: scale(0.95); 
         }
 
         .home-category-icon {
-            font-size: 48px;
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(36, 129, 204, 0.1);
-            border-radius: 16px;
-        }
-
-        .home-category-info {
-            flex: 1;
+            font-size: 36px;
+            margin-bottom: 8px;
         }
 
         .home-category-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
 
         .home-category-count {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-sec);
         }
 
         .home-category-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
+            top: 8px;
+            right: 8px;
             background: var(--accent);
             color: #fff;
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 12px;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 8px;
             font-weight: 700;
-        }
-
-        .home-category-arrow {
-            font-size: 20px;
-            color: var(--text-sec);
         }
 
         /* Subcategory Grid */
         .category-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
         .category-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 20px 16px;
+            padding: 16px 12px;
             text-align: center;
             cursor: pointer;
             border: 1px solid var(--border);
             position: relative;
+            min-height: 90px;
         }
         .category-card:active { opacity: 0.7; }
-        .category-icon { font-size: 36px; margin-bottom: 8px; }
-        .category-name { font-weight: 600; font-size: 15px; }
+        .category-icon { font-size: 32px; margin-bottom: 6px; }
+        .category-name { font-weight: 600; font-size: 14px; }
         .category-counter {
             position: absolute;
             top: 8px;
@@ -259,7 +246,7 @@
             color: #fff;
             font-size: 11px;
             padding: 2px 6px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 700;
         }
 
@@ -267,29 +254,29 @@
         .product-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 24px;
         }
 
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 14px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border);
-            min-height: 110px;
+            min-height: 100px;
         }
 
         .product-header {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
             align-items: flex-start;
         }
         .product-info { flex: 1; }
         .product-name { 
-            font-size: 15px; 
+            font-size: 14px; 
             font-weight: 600; 
             line-height: 1.3; 
             margin-bottom: 6px;
@@ -301,76 +288,70 @@
         .product-meta { 
             display: flex; 
             align-items: baseline; 
-            gap: 6px; 
-            font-size: 14px;
+            gap: 4px; 
+            font-size: 13px;
             margin-top: auto;
         }
-        .product-price { color: var(--accent); font-weight: 700; font-size: 16px; }
-        .product-unit { color: var(--text-sec); font-size: 12px; }
+        .product-price { color: var(--accent); font-weight: 700; font-size: 15px; }
+        .product-unit { color: var(--text-sec); font-size: 11px; }
 
         .product-actions {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: flex-end;
-            min-width: 70px;
+            gap: 4px;
         }
 
         .btn-add {
-            padding: 8px 18px;
-            border-radius: 18px;
+            padding: 6px 14px;
+            border-radius: 14px;
             background: rgba(36, 129, 204, 0.15);
             color: #5ac8fa;
             border: none;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             white-space: nowrap;
+            cursor: pointer;
         }
 
-        /* НОВЫЙ СЧЁТЧИК - кликабельный */
+        /* Счётчик - кликабельный */
         .counter {
             display: flex;
             align-items: center;
-            background: #2c2c2e;
-            border-radius: 18px;
-            padding: 4px;
-            border: 1px solid var(--accent);
-            gap: 2px;
+            background: rgba(36, 129, 204, 0.15);
+            border-radius: 14px;
+            padding: 4px 8px;
             cursor: pointer;
+            gap: 4px;
         }
         .counter:active { opacity: 0.7; }
         
-        .counter button {
-            background: transparent;
-            border: none;
-            color: var(--accent);
-            width: 26px;
-            height: 24px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .counter-val { 
             font-weight: 700; 
-            font-size: 14px; 
-            min-width: 24px; 
-            text-align: center;
+            font-size: 13px;
             color: var(--accent);
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .counter-unit {
+            font-size: 11px;
+            color: var(--text-sec);
         }
 
         .btn-comment {
             background: rgba(118, 118, 128, 0.24);
             border: none;
             color: var(--text-sec);
-            width: 32px;
-            height: 32px;
-            border-radius: 16px;
-            font-size: 16px;
-            margin-top: 4px;
+            width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
         .btn-comment.active { 
             background: rgba(36, 129, 204, 0.2); 
@@ -422,6 +403,7 @@
             border: none;
             font-weight: 700;
             font-size: 15px;
+            cursor: pointer;
         }
 
         /* Modals */
@@ -446,72 +428,45 @@
         }
         .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
 
-        /* KEYBOARD MODAL */
-        .keyboard-modal-body {
+        /* СИСТЕМНАЯ КЛАВИАТУРА */
+        .input-modal-body {
             padding: 20px 0;
         }
         
-        .keyboard-display {
-            background: rgba(0,0,0,0.3);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 24px;
-            border: 2px solid var(--accent);
-        }
-        
-        .keyboard-product-name {
+        .input-product-name {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            text-align: center;
             color: var(--text-sec);
         }
         
-        .keyboard-value {
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--accent);
-            min-height: 60px;
+        .input-wrapper {
             display: flex;
             align-items: center;
-            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            padding: 16px;
+            border: 2px solid var(--accent);
+            margin-bottom: 20px;
         }
         
-        .keyboard-unit {
+        .input-number {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            width: 100%;
+        }
+        
+        .input-unit {
             font-size: 18px;
             color: var(--text-sec);
-            margin-top: 8px;
-        }
-
-        .keyboard-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .keyboard-btn {
-            background: #2c2c2e;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .keyboard-btn:active {
-            background: #3a3a3c;
-            transform: scale(0.95);
-        }
-        .keyboard-btn.clear {
-            background: #3a3a3c;
-            color: #ff3b30;
-        }
-        .keyboard-btn.delete {
-            background: #3a3a3c;
-            color: #ff9500;
+            margin-left: 8px;
         }
 
         .comment-modal-body {
@@ -562,6 +517,7 @@
             font-weight: 700;
             border: none;
             font-size: 16px;
+            cursor: pointer;
         }
         .btn-confirm { background: var(--accent); color: #fff; }
         .btn-cancel { background: #3a3a3c; color: #fff; }
@@ -608,35 +564,20 @@
         <button class="btn-checkout" onclick="openOrderModal()">Оформить</button>
     </div>
 
-    <!-- Keyboard Modal -->
-    <div class="modal" id="keyboardModal">
+    <!-- Input Modal (системная клава) -->
+    <div class="modal" id="inputModal">
         <div class="modal-content">
             <div class="modal-title">Укажите количество</div>
-            <div class="keyboard-modal-body">
-                <div class="keyboard-display">
-                    <div class="keyboard-product-name" id="keyboardProductName"></div>
-                    <div class="keyboard-value" id="keyboardValue">0</div>
-                    <div class="keyboard-unit" id="keyboardUnit"></div>
-                </div>
-                
-                <div class="keyboard-grid">
-                    <button class="keyboard-btn" onclick="keyPress('1')">1</button>
-                    <button class="keyboard-btn" onclick="keyPress('2')">2</button>
-                    <button class="keyboard-btn" onclick="keyPress('3')">3</button>
-                    <button class="keyboard-btn" onclick="keyPress('4')">4</button>
-                    <button class="keyboard-btn" onclick="keyPress('5')">5</button>
-                    <button class="keyboard-btn" onclick="keyPress('6')">6</button>
-                    <button class="keyboard-btn" onclick="keyPress('7')">7</button>
-                    <button class="keyboard-btn" onclick="keyPress('8')">8</button>
-                    <button class="keyboard-btn" onclick="keyPress('9')">9</button>
-                    <button class="keyboard-btn" onclick="keyPress('.')">.</button>
-                    <button class="keyboard-btn" onclick="keyPress('0')">0</button>
-                    <button class="keyboard-btn delete" onclick="keyDelete()">⌫</button>
+            <div class="input-modal-body">
+                <div class="input-product-name" id="inputProductName"></div>
+                <div class="input-wrapper">
+                    <input type="number" class="input-number" id="inputNumber" step="0.1" min="0" inputmode="decimal" autofocus>
+                    <span class="input-unit" id="inputUnit"></span>
                 </div>
             </div>
             <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="closeKeyboardModal()">Отмена</button>
-                <button class="btn-modal btn-confirm" onclick="saveKeyboardValue()">Готово</button>
+                <button class="btn-modal btn-cancel" onclick="closeInputModal()">Отмена</button>
+                <button class="btn-modal btn-confirm" onclick="saveInputValue()">Готово</button>
             </div>
         </div>
     </div>
@@ -811,8 +752,7 @@
     let allItems = [];
     let fuse;
     let currentCommentItemId = null;
-    let currentKeyboardItemId = null;
-    let keyboardBuffer = '';
+    let currentInputItemId = null;
 
     function buildItemsList() {
         allItems = [];
@@ -842,7 +782,6 @@
         setupFilters();
     }
 
-    // === HOME (БЕЗ "ЧАСТО БЕРУТ") ===
     function renderHome() {
         currentView = 'home';
         currentCat = null;
@@ -862,7 +801,6 @@
         document.getElementById('alphabetIndex').classList.add('hidden');
     }
 
-    // НОВАЯ КАРТОЧКА КАТЕГОРИИ НА ГЛАВНОЙ
     function createHomeCategoryCard(key, cat) {
         const card = document.createElement('div');
         card.className = 'home-category-card';
@@ -884,11 +822,8 @@
         card.innerHTML = `
             ${count > 0 ? `<div class="home-category-badge">${count}</div>` : ''}
             <div class="home-category-icon">${cat.icon}</div>
-            <div class="home-category-info">
-                <div class="home-category-name">${cat.name}</div>
-                <div class="home-category-count">${itemCount} ${declension(itemCount, ['позиция', 'позиции', 'позиций'])}</div>
-            </div>
-            <div class="home-category-arrow">›</div>
+            <div class="home-category-name">${cat.name}</div>
+            <div class="home-category-count">${itemCount} ${declension(itemCount, ['позиция', 'позиции', 'позиций'])}</div>
         `;
         card.onclick = () => renderCategory(key);
         return card;
@@ -1002,7 +937,7 @@
                 </div>
                 <div class="product-actions">
                     <div id="btn-${item.id}">
-                        ${qty > 0 ? getCounterHtml(item.id, qty) : `<button class="btn-add" onclick="addItem('${item.id}')">+</button>`}
+                        ${qty > 0 ? getCounterHtml(item.id, qty, item.unit) : `<button class="btn-add" onclick="addItem('${item.id}')">+</button>`}
                     </div>
                     ${qty > 0 ? `<button class="btn-comment ${hasComment?'active':''}" onclick="openCommentModal('${item.id}')">💬</button>` : ''}
                 </div>
@@ -1011,8 +946,8 @@
         return card;
     }
 
-    function getCounterHtml(id, qty) {
-        return `<div class="counter" onclick="event.stopPropagation(); openKeyboardModal('${id}')"><div class="counter-val">${qty}</div></div>`;
+    function getCounterHtml(id, qty, unit) {
+        return `<div class="counter" onclick="event.stopPropagation(); openInputModal('${id}')"><div class="counter-val">${qty}</div><div class="counter-unit">${unit}</div></div>`;
     }
 
     window.addItem = function(id) {
@@ -1020,44 +955,35 @@
         updateUI(id);
     };
 
-    // === KEYBOARD MODAL ===
-    window.openKeyboardModal = function(id) {
-        currentKeyboardItemId = id;
+    // === INPUT MODAL (системная клавиатура) ===
+    window.openInputModal = function(id) {
+        currentInputItemId = id;
         const item = allItems.find(i => i.id === id);
-        keyboardBuffer = (cart[id] || 0).toString();
         
-        document.getElementById('keyboardProductName').innerText = item.name;
-        document.getElementById('keyboardUnit').innerText = item.unit;
-        document.getElementById('keyboardValue').innerText = keyboardBuffer || '0';
-        document.getElementById('keyboardModal').classList.add('visible');
+        document.getElementById('inputProductName').innerText = item.name;
+        document.getElementById('inputUnit').innerText = item.unit;
+        document.getElementById('inputNumber').value = cart[id] || '';
+        document.getElementById('inputModal').classList.add('visible');
+        
+        setTimeout(() => {
+            document.getElementById('inputNumber').focus();
+        }, 300);
     };
 
-    window.closeKeyboardModal = function() {
-        document.getElementById('keyboardModal').classList.remove('visible');
+    window.closeInputModal = function() {
+        document.getElementById('inputModal').classList.remove('visible');
     };
 
-    window.keyPress = function(val) {
-        if (keyboardBuffer === '0') keyboardBuffer = '';
-        if (val === '.' && keyboardBuffer.includes('.')) return;
-        keyboardBuffer += val;
-        document.getElementById('keyboardValue').innerText = keyboardBuffer;
-    };
-
-    window.keyDelete = function() {
-        keyboardBuffer = keyboardBuffer.slice(0, -1);
-        document.getElementById('keyboardValue').innerText = keyboardBuffer || '0';
-    };
-
-    window.saveKeyboardValue = function() {
-        const val = parseFloat(keyboardBuffer);
+    window.saveInputValue = function() {
+        const val = parseFloat(document.getElementById('inputNumber').value);
         if (val > 0) {
-            cart[currentKeyboardItemId] = val;
+            cart[currentInputItemId] = val;
         } else {
-            delete cart[currentKeyboardItemId];
-            delete comments[currentKeyboardItemId];
+            delete cart[currentInputItemId];
+            delete comments[currentInputItemId];
         }
-        updateUI(currentKeyboardItemId);
-        closeKeyboardModal();
+        updateUI(currentInputItemId);
+        closeInputModal();
     };
 
     function updateUI(id) {
