@@ -9,13 +9,12 @@
     <style>
         :root {
             --bg: #000000;
-            --card-bg: rgba(28, 28, 30, 0.6);
-            --item-bg: rgba(44, 44, 46, 0.6);
+            --card-bg: #1c1c1e;
+            --item-bg: #000000;
             --text: #ffffff;
             --text-sec: #8e8e93;
             --accent: #0a84ff;
-            --danger: #ff453a;
-            --glass: blur(20px) saturate(180%);
+            --border: #38383a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -24,229 +23,181 @@
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding-bottom: 100px;
+            padding-bottom: 80px; /* Уменьшил отступ снизу */
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
         }
 
-        /* GLASS HEADER */
+        /* HEADER */
         .header {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: var(--glass);
-            -webkit-backdrop-filter: var(--glass);
-            border-bottom: 0.5px solid rgba(255,255,255,0.1);
-            padding: 16px;
-            transition: all 0.3s ease;
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
         }
 
-        .search-wrap { 
-            position: relative; width: 100%; 
-            transform: translateZ(0);
-        }
+        .search-wrap { position: relative; width: 100%; }
         .search-input {
-            width: 100%; padding: 14px 44px 14px 44px;
-            border-radius: 18px; border: none;
-            background: rgba(118, 118, 128, 0.24);
-            color: #fff; font-size: 17px;
-            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            width: 100%; padding: 8px 36px 8px 32px; /* Более компактный поиск */
+            border-radius: 10px; border: none;
+            background: #2c2c2e; color: #fff; font-size: 15px;
         }
-        .search-input:focus {
-            background: rgba(118, 118, 128, 0.4);
-            transform: scale(1.01);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6; font-size: 18px; }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity: 0.5; font-size: 14px; }
 
-        /* ANIMATIONS */
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes tap { 0% { transform: scale(1); } 50% { transform: scale(0.96); } 100% { transform: scale(1); } }
+        /* CONTAINER */
+        .container { padding: 12px 12px; }
 
-        /* ACCORDION (iOS style lists) */
-        .container { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-
-        /* Main Category Card */
+        /* CATEGORY CARD */
         .cat-card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 22px;
+            border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 0.5px solid rgba(255,255,255,0.08);
+            margin-bottom: 16px; /* УВЕЛИЧЕННЫЙ ОТСТУП МЕЖДУ КАТЕГОРИЯМИ */
         }
+
         .cat-header {
-            padding: 20px;
+            padding: 14px 16px; /* Меньше паддинги */
             display: flex; align-items: center; justify-content: space-between;
-            font-size: 20px; font-weight: 700; letter-spacing: 0.3px;
+            font-size: 17px; font-weight: 600;
             cursor: pointer;
-            background: rgba(255,255,255,0.03);
+            background: var(--card-bg);
+            border-bottom: 1px solid transparent; /* Для плавности границ */
         }
-        .cat-header:active { background: rgba(255,255,255,0.08); }
-        .cat-icon { font-size: 28px; margin-right: 14px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .cat-header:active { background: #2c2c2e; }
+        .cat-icon { font-size: 20px; margin-right: 10px; }
         .arrow { 
-            font-size: 14px; color: rgba(235, 235, 245, 0.3); font-weight: 600; 
-            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1.3);
-            background: rgba(255,255,255,0.1); width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center; border-radius: 50%;
+            font-size: 12px; color: var(--text-sec); 
+            transition: transform 0.3s ease; 
         }
-        .cat-header.expanded .arrow { transform: rotate(180deg); background: var(--accent); color: #fff; }
+        .cat-header.expanded .arrow { transform: rotate(180deg); }
+        .cat-header.expanded { border-bottom: 1px solid var(--border); }
 
-        /* Subcategories */
-        .sub-container { display: none; padding-bottom: 8px; }
-        .sub-container.visible { display: block; animation: slideIn 0.3s ease-out; }
+        /* ACCORDION ANIMATION */
+        .sub-container { 
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out; /* ПЛАВНАЯ АНИМАЦИЯ */
+            background: var(--bg);
+        }
+        .sub-container.visible {
+            max-height: 2000px; /* Достаточно большое число для раскрытия */
+        }
 
-        .sub-group { margin: 0 12px 12px; border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.2); }
-
+        /* SUB-CATEGORY */
         .sub-header {
-            padding: 16px;
-            font-size: 17px; font-weight: 600; color: rgba(255,255,255,0.9);
+            padding: 10px 16px 10px 24px;
+            font-size: 14px; font-weight: 500; color: #fff;
             display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            background: #121212;
+            border-bottom: 1px solid #222;
         }
-        .sub-header:active { background: rgba(255,255,255,0.05); }
-        .sub-arrow { color: var(--text-sec); font-size: 12px; transition: transform 0.3s; }
-        .sub-header.expanded .sub-arrow { transform: rotate(180deg); color: var(--accent); }
+        .sub-arrow { font-size: 10px; color: var(--text-sec); transition: transform 0.3s; }
+        .sub-header.expanded .sub-arrow { transform: rotate(180deg); }
 
-        /* Item Rows */
-        .item-list { display: none; }
-        .item-list.visible { display: block; }
+        /* SUB-LIST ANIMATION */
+        .item-list-wrap {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+            background: #000;
+        }
+        .item-list-wrap.visible {
+            max-height: 1500px;
+        }
 
+        /* ITEM ROW - COMPACT */
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 16px;
-            border-bottom: 0.5px solid rgba(255,255,255,0.05);
-            background: rgba(30, 30, 32, 0.4);
-            transition: background 0.2s;
+            padding: 8px 16px; /* Компактные отступы */
+            border-bottom: 1px solid #222;
+            min-height: 44px;
         }
         .item-row:last-child { border-bottom: none; }
-        .item-info { flex: 1; padding-right: 14px; }
-        .item-name { 
-            font-size: 17px; font-weight: 500; color: #fff; line-height: 1.3;
-            letter-spacing: -0.2px;
-        }
 
-        /* CONTROLS (BIGGER & BETTER) */
+        .item-name { font-size: 15px; font-weight: 400; color: #fff; flex: 1; padding-right: 10px; }
+
+        /* CONTROLS - COMPACT & CLEAN */
         .btn-add {
-            background: var(--accent);
-            color: #fff;
+            background: rgba(10, 132, 255, 0.15);
+            color: var(--accent);
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 600; font-size: 15px;
-            box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
-            transition: transform 0.1s;
+            padding: 4px 12px; /* Маленькая кнопка */
+            border-radius: 8px;
+            font-weight: 500; font-size: 13px;
             cursor: pointer;
         }
-        .btn-add:active { transform: scale(0.94); box-shadow: 0 2px 6px rgba(10, 132, 255, 0.2); }
 
-        .counter-pill {
-            display: flex; align-items: center; gap: 2px;
-            background: rgba(60, 60, 65, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 4px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.2s;
+        .counter-wrap {
+            display: flex; align-items: center; gap: 4px;
+            background: #2c2c2e; /* Темный фон для контроллера */
+            border-radius: 8px;
+            padding: 2px;
         }
-        .counter-pill:active { transform: scale(0.96); }
 
         .btn-mini {
-            width: 36px; height: 36px;
-            border-radius: 50%; border: none;
+            width: 28px; height: 28px; /* Маленькие кнопки +/- */
+            border-radius: 6px; border: none;
             display: flex; align-items: center; justify-content: center;
-            font-size: 18px; font-weight: 600;
-            cursor: pointer; transition: background 0.2s;
+            font-size: 16px; font-weight: 500;
+            cursor: pointer; background: transparent; color: var(--accent);
         }
-        .btn-minus { background: transparent; color: #ff453a; }
-        .btn-minus:active { background: rgba(255, 69, 58, 0.2); }
-        .btn-plus { background: #fff; color: #000; }
-        .btn-plus:active { background: #e5e5e5; }
+        .btn-mini:active { background: rgba(255,255,255,0.1); }
+        .btn-mini.minus { color: #ff453a; }
 
         .val-display {
-            min-width: 44px; text-align: center;
-            font-size: 16px; font-weight: 700; color: #fff;
-            font-variant-numeric: tabular-nums;
+            min-width: 30px; text-align: center;
+            font-size: 14px; font-weight: 600; color: #fff;
+            cursor: pointer;
         }
 
         .btn-comment {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255,255,255,0.08); border: none;
-            color: #fff; font-size: 18px; margin-right: 10px;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
+            font-size: 16px; background: transparent; border: none; 
+            padding: 4px; opacity: 0.3; margin-right: 4px; filter: grayscale(1);
         }
-        .btn-comment.active { background: var(--accent); box-shadow: 0 0 10px rgba(10,132,255,0.5); }
-        .btn-comment:active { transform: scale(0.9); }
+        .btn-comment.active { opacity: 1; filter: none; }
 
-        /* FLOATING CART (Glassmorphism) */
+        /* CART BAR */
         .cart-bar {
-            position: fixed; bottom: 24px; left: 16px; right: 16px;
-            height: 64px;
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-radius: 32px;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1c1c1e;
+            border-top: 1px solid var(--border);
+            padding: 10px 16px;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 8px 0 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
+            transform: translateY(100%); transition: transform 0.3s;
             z-index: 900;
-            transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .cart-bar.visible { transform: translateY(0); }
-
-        .cart-info { display: flex; flex-direction: column; }
-        .cart-count { font-size: 18px; font-weight: 700; color: #fff; }
-        .cart-sub { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; }
-
+        .cart-info { font-size: 14px; font-weight: 600; color: #fff; }
         .btn-checkout {
-            background: #fff; color: #000;
-            border: none; padding: 0 24px; height: 48px;
-            border-radius: 24px;
-            font-weight: 700; font-size: 16px;
-            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
-            transition: transform 0.2s;
+            background: var(--accent); color: #fff; border: none;
+            padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;
         }
-        .btn-checkout:active { transform: scale(0.94); }
 
-        /* MODALS (iOS Sheet) */
+        /* MODALS */
         .modal {
-            position: fixed; inset: 0; z-index: 2000;
-            background: rgba(0,0,0,0.01); 
-            display: none; align-items: flex-end;
-            transition: background 0.3s;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
         }
-        .modal.visible { background: rgba(0,0,0,0.6); display: flex; backdrop-filter: blur(4px); }
-
-        .modal-card {
-            background: #1c1c1e; width: 100%;
-            border-radius: 28px 28px 0 0; padding: 24px 20px 40px;
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.15, 0.9, 0.3, 1.1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-            border-top: 1px solid rgba(255,255,255,0.1);
+        .modal.visible { display: flex; }
+        .modal-box {
+            background: #1c1c1e; width: 85%; max-width: 320px;
+            border-radius: 14px; padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .modal.visible .modal-card { transform: translateY(0); }
-
-        .modal-drag { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 0 auto 20px; }
 
         .sys-input {
-            width: 100%; background: transparent; border: none;
-            color: #fff; font-size: 48px; font-weight: 800;
-            text-align: center; margin: 20px 0; outline: none;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            width: 100%; background: #000; border: 1px solid #333;
+            color: #fff; font-size: 24px; font-weight: 700;
+            text-align: center; margin: 15px 0; padding: 10px; border-radius: 8px;
         }
-
-        .modal-btns { display: flex; gap: 12px; }
-        .btn-modal {
-            flex: 1; padding: 16px; border-radius: 18px; border: none;
-            font-size: 17px; font-weight: 600; cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .btn-modal:active { transform: scale(0.97); }
-        .btn-sec { background: rgba(255,255,255,0.1); color: #fff; }
-        .btn-prim { background: #fff; color: #000; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
+        .modal-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-mod { flex: 1; padding: 10px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .btn-grey { background: #333; color: #fff; }
+        .btn-blue { background: var(--accent); color: #fff; }
 
         .hidden { display: none !important; }
     </style>
@@ -256,67 +207,62 @@
     <div class="header">
         <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" id="search" placeholder="Поиск (например: авокадо)">
+            <input type="text" class="search-input" id="search" placeholder="Поиск...">
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="container">
-        <div id="searchResults" class="search-results hidden" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <div id="searchResults" class="hidden"></div>
         <div id="accordionView"></div>
     </div>
 
-    <!-- Glass Cart Bar -->
+    <!-- Cart Bar -->
     <div class="cart-bar" id="cartBar">
-        <div class="cart-info">
-            <span class="cart-count" id="cartCount">0 товаров</span>
-            <span class="cart-sub">Нажмите для заказа</span>
-        </div>
-        <button class="btn-checkout" onclick="openOrderModal()">Оформить ➔</button>
+        <div class="cart-info" id="cartCount">0 поз.</div>
+        <button class="btn-checkout" onclick="openOrderModal()">В корзину</button>
     </div>
 
     <!-- Input Modal -->
-    <div class="modal" id="inputModal" onclick="if(event.target===this) closeModal('inputModal')">
-        <div class="modal-card">
-            <div class="modal-drag"></div>
-            <div id="inputName" style="text-align: center; color: var(--text-sec); font-size:16px; font-weight:500;"></div>
+    <div class="modal" id="inputModal">
+        <div class="modal-box">
+            <div id="inputName" style="color: #8e8e93; font-size: 14px; margin-bottom: 5px;"></div>
             <input type="number" id="sysInput" class="sys-input" inputmode="decimal" placeholder="0">
-            <div style="text-align:center; color:#555; margin-bottom:20px; font-size:14px;">Введите точное количество</div>
             <div class="modal-btns">
-                <button class="btn-modal btn-sec" onclick="closeModal('inputModal')">Отмена</button>
-                <button class="btn-modal btn-prim" onclick="saveInput()">Готово</button>
+                <button class="btn-mod btn-grey" onclick="closeModal('inputModal')">Отмена</button>
+                <button class="btn-mod btn-blue" onclick="saveInput()">ОК</button>
             </div>
         </div>
     </div>
 
     <!-- Comment Modal -->
-    <div class="modal" id="commentModal" onclick="if(event.target===this) closeModal('commentModal')">
-        <div class="modal-card">
-            <div class="modal-drag"></div>
-            <h3 style="text-align:center; margin-bottom:16px;">Комментарий</h3>
-            <textarea id="comText" style="width:100%; height:120px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:16px; padding:16px; font-size:17px; resize:none;" placeholder="Напишите пожелания..."></textarea>
-            <div class="modal-btns" style="margin-top:20px;">
-                <button class="btn-modal btn-sec" onclick="closeModal('commentModal')">Отмена</button>
-                <button class="btn-modal btn-prim" onclick="saveComment()">Сохранить</button>
+    <div class="modal" id="commentModal">
+        <div class="modal-box">
+            <div style="margin-bottom:10px; font-weight:600;">Комментарий</div>
+            <textarea id="comText" style="width:100%; height:80px; background:#000; border:1px solid #333; color:#fff; border-radius:8px; padding:10px; font-size:14px; resize:none;"></textarea>
+            <div class="modal-btns">
+                <button class="btn-mod btn-grey" onclick="closeModal('commentModal')">Отмена</button>
+                <button class="btn-mod btn-blue" onclick="saveComment()">Сохранить</button>
             </div>
         </div>
     </div>
 
     <!-- Order Modal -->
-    <div class="modal" id="orderModal" onclick="if(event.target===this) closeModal('orderModal')">
-        <div class="modal-card" style="max-height:90vh;">
-            <div class="modal-drag"></div>
-            <h2 style="font-size:28px; font-weight:800; margin-bottom:20px;">Ваш заказ</h2>
-            <div id="orderList" style="margin-bottom: 24px; max-height:40vh; overflow-y:auto; padding-right:4px;"></div>
-            <textarea id="globalCom" style="width:100%; height:80px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:16px; padding:16px; font-size:16px; margin-bottom:20px;" placeholder="Общий комментарий к заказу..."></textarea>
-            <button class="btn-modal btn-prim" style="width:100%; padding:18px;" onclick="sendOrder()">Отправить в Telegram</button>
+    <div class="modal" id="orderModal">
+        <div class="modal-box" style="width:95%; max-width:400px; text-align:left;">
+            <div style="font-size:18px; font-weight:700; margin-bottom:15px; text-align:center;">Ваш заказ</div>
+            <div id="orderList" style="max-height:50vh; overflow-y:auto; margin-bottom:15px; border-top:1px solid #333;"></div>
+            <textarea id="globalCom" style="width:100%; height:60px; background:#000; border:1px solid #333; color:#fff; border-radius:8px; padding:10px; font-size:14px; margin-bottom:15px;" placeholder="Общий комментарий..."></textarea>
+            <div class="modal-btns">
+                <button class="btn-mod btn-grey" onclick="closeModal('orderModal')">Закрыть</button>
+                <button class="btn-mod btn-blue" onclick="sendOrder()">Отправить</button>
+            </div>
         </div>
     </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.setHeaderColor('#141414');
+    tg.setHeaderColor('#1c1c1e');
     tg.setBackgroundColor('#000000');
 
     // DATA
@@ -590,7 +536,7 @@
                     <div style="display:flex; align-items:center;">
                         <span class="cat-icon">${cat.icon}</span>${cat.name}
                     </div>
-                    <div class="arrow">↓</div>
+                    <div class="arrow">▼</div>
                 </div>
                 <div class="sub-container"></div>
             `;
@@ -602,37 +548,42 @@
                     const sub = cat.subs[subKey];
                     const isSingle = Object.keys(cat.subs).length === 1 && subKey === 'all';
 
-                    const group = document.createElement('div');
-                    group.className = 'sub-group';
-
                     if(isSingle) {
-                        group.innerHTML = `<div class="item-list visible" id="list-${catKey}-${subKey}"></div>`;
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'item-list-wrap visible'; // Always visible if single
+                        wrapper.id = `list-${catKey}-${subKey}`;
+                        wrapper.style.maxHeight = 'none'; // No anim for static list
+                        subCont.appendChild(wrapper);
+                        // Add items immediately
+                        sub.items.forEach(item => wrapper.appendChild(createItemRow(item)));
                     } else {
+                        const group = document.createElement('div');
                         group.innerHTML = `
                             <div class="sub-header" onclick="toggleSub(this)">
                                 <span>${sub.name}</span>
                                 <span class="sub-arrow">▼</span>
                             </div>
-                            <div class="item-list" id="list-${catKey}-${subKey}"></div>
+                            <div class="item-list-wrap" id="list-${catKey}-${subKey}"></div>
                         `;
+                        subCont.appendChild(group);
+                        const listEl = group.querySelector(`#list-${catKey}-${subKey}`);
+                        sub.items.forEach(item => listEl.appendChild(createItemRow(item)));
                     }
-                    subCont.appendChild(group);
-
-                    const listEl = group.querySelector(`#list-${catKey}-${subKey}`);
-                    sub.items.forEach(item => listEl.appendChild(createItemRow(item)));
                 });
             }
         });
     }
 
     function toggleCat(header) {
+        const cont = header.nextElementSibling;
         header.classList.toggle('expanded');
-        header.nextElementSibling.classList.toggle('visible');
+        cont.classList.toggle('visible');
     }
 
     function toggleSub(header) {
+        const list = header.nextElementSibling;
         header.classList.toggle('expanded');
-        header.nextElementSibling.classList.toggle('visible');
+        list.classList.toggle('visible');
     }
 
     function createItemRow(i) {
@@ -653,31 +604,29 @@
             controls = `<button class="btn-add" onclick="addItem('${i.id}')">Добавить</button>`;
         } else {
             controls = `
-                <div class="counter-pill">
+                <div class="counter-wrap">
                     <button class="btn-comment ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>
-                    <button class="btn-mini btn-minus" onclick="changeQty('${i.id}', -1)">−</button>
+                    <button class="btn-mini minus" onclick="changeQty('${i.id}', -1)">−</button>
                     <div class="val-display" onclick="openInput('${i.id}')">${q}</div>
-                    <button class="btn-mini btn-plus" onclick="changeQty('${i.id}', 1)">+</button>
+                    <button class="btn-mini plus" onclick="changeQty('${i.id}', 1)">+</button>
                 </div>
             `;
         }
 
         return `
-            <div class="item-info">
-                <div class="item-name">${i.name}</div>
-            </div>
+            <div class="item-name">${i.name}</div>
             <div>${controls}</div>
         `;
     }
 
     // ACTIONS
-    window.addItem = (id) => { cart[id] = 1; refreshItem(id); triggerTap(); }
+    window.addItem = (id) => { cart[id] = 1; refreshItem(id); }
     window.changeQty = (id, delta) => {
         const curr = cart[id] || 0;
         const next = curr + delta;
         if(next <= 0) { delete cart[id]; delete comments[id]; } 
         else cart[id] = next;
-        refreshItem(id); triggerTap();
+        refreshItem(id);
     }
 
     function refreshItem(id) {
@@ -692,7 +641,7 @@
     function updateCartBar() {
         const count = Object.keys(cart).length;
         const bar = document.getElementById('cartBar');
-        document.getElementById('cartCount').innerText = `${count} позиций`;
+        document.getElementById('cartCount').innerText = `${count} поз.`;
 
         if(count > 0) bar.classList.add('visible'); 
         else bar.classList.remove('visible');
@@ -734,18 +683,18 @@
         allItems.forEach(i => {
             if(cart[i.id]) {
                 const row = document.createElement('div');
-                row.style.padding = '12px 0';
-                row.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                row.style.padding = '8px 0';
+                row.style.borderBottom = '1px solid #333';
                 row.style.display = 'flex'; row.style.justifyContent='space-between';
 
-                let comHtml = comments[i.id] ? `<div style="color:#0a84ff; font-size:13px; margin-top:4px;">💬 ${comments[i.id]}</div>` : '';
+                let comHtml = comments[i.id] ? `<div style="color:#0a84ff; font-size:12px;">💬 ${comments[i.id]}</div>` : '';
 
                 row.innerHTML = `
-                    <div>
-                        <div style="font-size:16px; font-weight:600;">${i.name}</div>
+                    <div style="flex:1; padding-right:10px;">
+                        <div style="font-size:14px;">${i.name}</div>
                         ${comHtml}
                     </div>
-                    <div style="font-size:18px; font-weight:700;">${cart[i.id]} <span style="font-size:12px; font-weight:400; color:#888;">${i.u}</span></div>
+                    <div style="font-size:14px; font-weight:700;">${cart[i.id]} ${i.u}</div>
                 `;
                 list.appendChild(row);
             }
@@ -773,19 +722,19 @@
 
             const res = fuse.search(val);
             resDiv.innerHTML = '';
-            if(res.length===0) { resDiv.innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Ничего не найдено</div>'; return; }
+            if(res.length===0) { resDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#666; font-size:13px;">Пусто</div>'; return; }
 
             res.forEach(r => {
                 const d = document.createElement('div');
-                d.className = 'cat-card'; // Reuse styling
-                d.innerHTML = `<div class="item-row" id="search-row-${r.item.id}">${renderItemContent(r.item)}</div>`;
+                d.className = 'item-row';
+                d.id = `search-row-${r.item.id}`;
+                d.style.borderBottom = '1px solid #333';
+                d.innerHTML = renderItemContent(r.item);
                 resDiv.appendChild(d);
             });
         });
     }
 
-    // ANIMATIONS
-    function triggerTap() { document.body.style.animation = 'none'; document.body.offsetHeight; document.body.style.animation = 'tap 0.2s'; }
     window.openModal = (id) => document.getElementById(id).classList.add('visible');
     window.closeModal = (id) => document.getElementById(id).classList.remove('visible');
 
