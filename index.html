@@ -3,90 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fresh Market 2026</title>
+    <title>Fresh Market</title>
+    <!-- Telegram API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Fuse.js для умного поиска -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <style>
         :root {
-            --primary: #34c759; /* Apple Green */
-            --bg-grad-1: #e0f2f1;
-            --bg-grad-2: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --text-main: #1c1c1e;
-            --text-sec: #8e8e93;
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-        }
-        
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-grad-1: #000000;
-                --bg-grad-2: #1c1c1e;
-                --glass-bg: rgba(30, 30, 30, 0.75);
-                --glass-border: rgba(255, 255, 255, 0.1);
-                --text-main: #ffffff;
-                --text-sec: #8e8e93;
-            }
+            /* Цвета берем из темы Телеграма */
+            --tg-bg: var(--tg-theme-bg-color, #fff);
+            --tg-text: var(--tg-theme-text-color, #000);
+            --tg-hint: var(--tg-theme-hint-color, #999);
+            --tg-link: var(--tg-theme-link-color, #2481cc);
+            --tg-button: var(--tg-theme-button-color, #2481cc); /* Синий */
+            --tg-button-text: var(--tg-theme-button-text-color, #fff);
+            --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f0f2f5);
+            
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --radius: 14px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
             margin: 0;
             padding: 0;
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 120px; /* Space for FAB */
+            background-color: var(--tg-secondary-bg);
+            color: var(--tg-text);
+            padding-bottom: 100px; /* Место под кнопку */
+            overflow-y: scroll; /* Для плавности */
         }
 
-        /* === HEADER & SEARCH === */
+        /* === HEADER === */
         .header {
             position: sticky;
             top: 0;
-            z-index: 100;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            z-index: 999;
+            background: var(--tg-bg);
             padding: 12px 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .search-box {
+        .search-container {
             position: relative;
-            width: 100%;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 16px 12px 40px;
+            padding: 12px 40px 12px 16px;
             border-radius: 12px;
-            border: none;
-            background: rgba(118, 118, 128, 0.12);
-            color: var(--text-main);
+            border: 1px solid transparent;
+            background: var(--tg-secondary-bg);
+            color: var(--tg-text);
             font-size: 16px;
             outline: none;
-            transition: all 0.2s;
+            transition: 0.2s;
+            box-sizing: border-box; /* Важно! */
         }
         
-        .search-input:focus { background: rgba(118, 118, 128, 0.2); }
-        
+        .search-input:focus {
+            background: var(--tg-bg);
+            border-color: var(--tg-button);
+            box-shadow: 0 0 0 2px rgba(36, 129, 204, 0.2);
+        }
+
         .search-icon {
             position: absolute;
-            left: 12px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-sec);
+            opacity: 0.5;
             pointer-events: none;
         }
 
-        /* === CATEGORY TABS === */
+        /* === TABS === */
         .tabs {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             overflow-x: auto;
             padding: 12px 16px;
+            background: var(--tg-bg);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             scrollbar-width: none;
         }
         .tabs::-webkit-scrollbar { display: none; }
@@ -94,88 +90,72 @@
         .tab {
             padding: 8px 16px;
             border-radius: 20px;
-            background: rgba(118, 118, 128, 0.12);
-            color: var(--text-main);
+            background: var(--tg-secondary-bg);
+            color: var(--tg-text);
             font-weight: 500;
             white-space: nowrap;
             cursor: pointer;
             transition: 0.2s;
+            border: 1px solid transparent;
         }
         .tab.active {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+            background: var(--tg-button);
+            color: var(--tg-button-text);
         }
 
-        /* === PRODUCT GRID === */
-        .container {
-            padding: 0 16px;
-        }
-
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 24px 0 12px;
-            opacity: 0.9;
-        }
-
+        /* === GRID === */
         .grid {
             display: grid;
-            grid-template-columns: 1fr; /* List view on mobile looks better for long names */
+            grid-template-columns: 1fr; /* Одна колонка на мобиле лучше читается */
+            gap: 16px; /* Увеличили отступы */
+            padding: 16px;
+        }
+
+        .card {
+            background: var(--tg-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
             gap: 12px;
         }
 
-        /* Glassmorphism Card */
-        .card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(4px);
-            transition: transform 0.2s;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .card:active { transform: scale(0.98); }
-
-        .card-row {
+        .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
         }
 
-        .card-info { flex: 1; padding-right: 12px; }
-        .card-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
-        .card-price { color: var(--primary); font-weight: 700; font-size: 15px; }
-        .card-unit { font-size: 13px; color: var(--text-sec); font-weight: 400; }
+        .card-info { flex: 1; margin-right: 10px; }
+        .card-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
+        .card-price { color: var(--tg-button); font-weight: 700; font-size: 16px; }
+        .card-unit { color: var(--tg-hint); font-size: 14px; font-weight: 400; }
 
-        /* Controls */
+        /* Кнопки */
         .btn-add {
-            background: rgba(118, 118, 128, 0.1);
-            color: var(--primary);
-            border: none;
             padding: 8px 20px;
             border-radius: 20px;
+            background: rgba(36, 129, 204, 0.1); /* Легкий синий */
+            color: var(--tg-button);
+            border: none;
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
+            transition: 0.2s;
         }
+        .btn-add:active { transform: scale(0.95); }
 
         .counter {
             display: flex;
             align-items: center;
-            background: var(--primary);
+            background: var(--tg-button);
             border-radius: 20px;
-            padding: 2px;
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3);
+            padding: 4px;
+            color: var(--tg-button-text);
         }
-        
         .counter button {
-            background: none;
+            background: transparent;
             border: none;
             color: #fff;
             width: 32px;
@@ -184,76 +164,142 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
-        
-        .counter span { font-weight: 600; font-size: 14px; min-width: 20px; text-align: center; }
+        .count-val { min-width: 24px; text-align: center; font-weight: 600; font-size: 15px; }
 
-        /* Comments */
-        .comment-box {
-            margin-top: 10px;
+        /* Комментарий к товару */
+        .comment-field {
+            margin-top: 8px;
             display: none;
-            animation: slideDown 0.3s ease;
+            animation: slideDown 0.3s;
         }
-        .comment-box.visible { display: block; }
+        .comment-field.visible { display: block; }
         
-        .comment-input {
+        .item-comment-input {
             width: 100%;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--glass-border);
-            background: rgba(118, 118, 128, 0.08);
-            color: var(--text-main);
-            font-size: 13px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--tg-secondary-bg);
+            color: var(--tg-text);
+            font-size: 14px;
+            box-sizing: border-box;
             outline: none;
         }
 
-        /* Order Comment */
-        .order-comment-section {
-            margin: 30px 16px;
-            background: var(--glass-bg);
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
+        /* === MODAL CONFIRM === */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            backdrop-filter: blur(4px);
+            align-items: flex-end; /* Шторка снизу */
+        }
+        .modal-overlay.visible { display: flex; }
+
+        .modal-content {
+            background: var(--tg-bg);
+            width: 100%;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s;
         }
 
-        .order-comment-title { font-weight: 600; margin-bottom: 8px; }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 16px; }
+        
+        .summary-list { margin-bottom: 20px; }
+        .summary-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-name { font-weight: 500; font-size: 15px; }
+        .summary-note { font-size: 13px; color: var(--tg-hint); margin-top: 2px; }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .global-comment-area {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--tg-secondary-bg);
+            color: var(--tg-text);
+            font-size: 15px;
+            min-height: 80px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            font-family: inherit;
         }
 
-        .hidden { display: none !important; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .btn-modal {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+        .btn-confirm { background: var(--tg-button); color: var(--tg-button-text); }
+        .btn-cancel { background: var(--tg-secondary-bg); color: var(--tg-text); }
+
+        @keyframes slideDown { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1;} }
+        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+
+        .empty-state {
+            text-align: center;
+            color: var(--tg-hint);
+            padding: 40px 20px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Шапка -->
     <div class="header">
-        <div class="search-box">
+        <div class="search-container">
+            <input type="text" class="search-input" id="search" placeholder="Поиск (напр. Авкдо)...">
             <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" id="search" placeholder="Поиск (например: авокадо)...">
         </div>
     </div>
 
-    <!-- Tabs -->
+    <!-- Табы -->
     <div class="tabs" id="tabs"></div>
 
-    <!-- Content -->
-    <div id="content" class="container"></div>
+    <!-- Список товаров -->
+    <div class="grid" id="content"></div>
 
-    <!-- Order Comment -->
-    <div class="order-comment-section hidden" id="orderCommentBlock">
-        <div class="order-comment-title">💬 Комментарий к заказу (общий)</div>
-        <textarea class="comment-input" id="globalComment" rows="2" placeholder="Например: Позвоните за час..."></textarea>
+    <!-- Модалка подтверждения -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-title">Ваш заказ</div>
+            <div id="modalSummary" class="summary-list"></div>
+            
+            <div style="font-weight:600; margin-bottom:8px;">Комментарий ко всему заказу:</div>
+            <textarea class="global-comment-area" id="globalComment" placeholder="Позвоните мне, нужен чек..."></textarea>
+            
+            <div class="modal-buttons">
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Назад</button>
+                <button class="btn-modal btn-confirm" onclick="sendOrder()">Отправить</button>
+            </div>
+        </div>
     </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
     
-    // === DATA ===
-    // Полный список с ID, который мы сгенерировали
+    // === ДАННЫЕ ===
     const DB = [
   {
     "id": "veg",
@@ -407,18 +453,47 @@
   }
 ];
 
-    let cart = {}; // {id: quantity}
-    let comments = {}; // {id: text}
-    let activeCat = "veg";
+    // Подготовка Fuse.js (Умный поиск)
+    let allItems = [];
+    DB.forEach(cat => allItems = allItems.concat(cat.items));
+    
+    const fuse = new Fuse(allItems, {
+        keys: ['name'],
+        threshold: 0.4, // Насколько сильно можно ошибаться (0.4 - оптимально)
+        distance: 100
+    });
+
+    let cart = {}; 
+    let comments = {};
+    let activeCat = DB[0].id;
+    let totalPrice = 0;
 
     function init() {
         renderTabs();
-        renderItems(DB[0].items); // Default category
+        renderItems(DB[0].items);
         
-        // Listeners
-        document.getElementById('search').addEventListener('input', (e) => doSearch(e.target.value));
+        // Поиск
+        document.getElementById('search').addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val.length === 0) {
+                // Восстанавливаем категорию
+                let cat = DB.find(c => c.id === activeCat);
+                if (cat) renderItems(cat.items);
+            } else {
+                // Fuse поиск
+                const results = fuse.search(val).map(res => res.item);
+                renderItems(results);
+            }
+        });
+
+        tg.MainButton.setParams({
+            text: 'ОФОРМИТЬ ЗАКАЗ',
+            color: '#2481cc' // Синий
+        });
         
-        tg.MainButton.setParams({ color: '#34c759' });
+        tg.MainButton.onClick(() => {
+            openModal(); // Теперь открываем модалку, а не отправляем сразу
+        });
     }
 
     function renderTabs() {
@@ -429,10 +504,12 @@
             el.className = `tab ${idx===0?'active':''}`;
             el.innerText = cat.name;
             el.onclick = () => {
+                // Сброс поиска
+                document.getElementById('search').value = '';
+                // Переключение
                 document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
                 el.classList.add('active');
                 activeCat = cat.id;
-                document.getElementById('search').value = ''; // clear search
                 renderItems(cat.items);
             };
             c.appendChild(el);
@@ -444,7 +521,7 @@
         c.innerHTML = '';
         
         if(items.length === 0) {
-            c.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">Ничего не найдено</div>';
+            c.innerHTML = '<div class="empty-state">Ничего не найдено 🤷‍♂️</div>';
             return;
         }
 
@@ -454,22 +531,23 @@
             
             let qty = cart[prod.id] || 0;
             let comment = comments[prod.id] || "";
-            let priceHtml = prod.price > 0 ? `${prod.price}₽` : 'По запросу';
+            let priceText = prod.price > 0 ? `${prod.price} ₽` : 'Цена по факту';
 
             el.innerHTML = `
-                <div class="card-row">
+                <div class="card-header">
                     <div class="card-info">
                         <div class="card-name">${prod.name}</div>
-                        <div><span class="card-price">${priceHtml}</span> <span class="card-unit">/ ${prod.unit}</span></div>
+                        <div class="card-unit">${prod.unit}</div>
+                        <div class="card-price">${priceText}</div>
                     </div>
                     <div id="btn-${prod.id}">
-                        ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">В корзину</button>`}
+                        ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">Добавить</button>`}
                     </div>
                 </div>
                 
-                <div class="comment-box ${qty > 0 ? 'visible' : ''}" id="com-box-${prod.id}">
-                    <input type="text" class="comment-input" 
-                           placeholder="Комментарий (напр. только спелые)..." 
+                <div class="comment-field ${qty>0 ? 'visible' : ''}" id="com-${prod.id}">
+                    <input type="text" class="item-comment-input" 
+                           placeholder="✏️ Комментарий к товару..." 
                            value="${comment}"
                            oninput="saveComment('${prod.id}', this.value)">
                 </div>
@@ -482,7 +560,7 @@
         return `
             <div class="counter">
                 <button onclick="change('${id}', -1)">−</button>
-                <span>${qty}</span>
+                <div class="count-val">${qty}</div>
                 <button onclick="change('${id}', 1)">+</button>
             </div>
         `;
@@ -498,7 +576,7 @@
         cart[id] += delta;
         if (cart[id] <= 0) {
             delete cart[id];
-            delete comments[id]; // удаляем коммент если удалили товар
+            delete comments[id];
         }
         updateUI(id);
     }
@@ -509,80 +587,87 @@
     }
 
     function updateUI(id) {
-        // Update Card Button
+        // Обновляем кнопку в списке
         let btn = document.getElementById(`btn-${id}`);
-        let comBox = document.getElementById(`com-box-${id}`);
+        let comField = document.getElementById(`com-${id}`);
         
         if(btn) {
             let qty = cart[id] || 0;
             if (qty > 0) {
                 btn.innerHTML = getCounterHtml(id, qty);
-                if(comBox) comBox.classList.add('visible');
+                if(comField) comField.classList.add('visible');
             } else {
-                btn.innerHTML = `<button class="btn-add" onclick="add('${id}')">В корзину</button>`;
-                if(comBox) comBox.classList.remove('visible');
+                btn.innerHTML = `<button class="btn-add" onclick="add('${id}')">Добавить</button>`;
+                if(comField) comField.classList.remove('visible');
             }
         }
         
-        // Update Main Button
-        let total = 0;
+        calcTotal();
+    }
+
+    function calcTotal() {
+        totalPrice = 0;
         let count = 0;
-        
-        DB.forEach(cat => {
-            cat.items.forEach(p => {
-                if(cart[p.id]) {
-                    total += p.price * cart[p.id];
-                    count++;
-                }
-            });
+        allItems.forEach(p => {
+            if(cart[p.id]) {
+                totalPrice += p.price * cart[p.id];
+                count++;
+            }
         });
 
         if (count > 0) {
-            tg.MainButton.setText(`ЗАКАЗАТЬ (${total}₽)`);
+            tg.MainButton.setText(`ОФОРМИТЬ (${totalPrice} ₽)`);
             tg.MainButton.show();
-            document.getElementById('orderCommentBlock').classList.remove('hidden');
         } else {
             tg.MainButton.hide();
-            document.getElementById('orderCommentBlock').classList.add('hidden');
         }
     }
 
-    // SEARCH
-    function doSearch(query) {
-        query = query.toLowerCase();
+    // === MODAL LOGIC ===
+    window.openModal = function() {
+        const list = document.getElementById('modalSummary');
+        list.innerHTML = '';
         
-        // Unselect tabs visual
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        
-        if (!query) {
-            // Restore active tab
-            // For simplicity just render first category or active
-            const activeTabIdx = DB.findIndex(c => c.id === activeCat);
-            document.querySelectorAll('.tab')[activeTabIdx].classList.add('active');
-            renderItems(DB[activeTabIdx].items);
-            return;
-        }
-
-        let results = [];
-        DB.forEach(cat => {
-            cat.items.forEach(p => {
-                if (p.name.toLowerCase().includes(query)) results.push(p);
-            });
+        let hasItems = false;
+        allItems.forEach(p => {
+            if(cart[p.id]) {
+                hasItems = true;
+                let row = document.createElement('div');
+                row.className = 'summary-item';
+                
+                let commHtml = comments[p.id] ? `<div class="summary-note">✏️ ${comments[p.id]}</div>` : '';
+                
+                row.innerHTML = `
+                    <div style="flex:1">
+                        <div class="summary-name">${p.name}</div>
+                        ${commHtml}
+                    </div>
+                    <div style="font-weight:600; white-space:nowrap; margin-left:10px;">
+                        ${cart[p.id]} ${p.unit}
+                    </div>
+                `;
+                list.appendChild(row);
+            }
         });
-        
-        renderItems(results);
+
+        if(!hasItems) return; // Не должно случаться
+        document.getElementById('confirmModal').classList.add('visible');
     }
 
-    tg.MainButton.onClick(() => {
+    window.closeModal = function() {
+        document.getElementById('confirmModal').classList.remove('visible');
+    }
+
+    window.sendOrder = function() {
         const globalComment = document.getElementById('globalComment').value;
         const data = {
             cart: cart,
             comments: comments,
             global_comment: globalComment,
-            total_price: tg.MainButton.text
+            total_price: `${totalPrice} ₽`
         };
         tg.sendData(JSON.stringify(data));
-    });
+    }
     
     init();
 </script>
