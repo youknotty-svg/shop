@@ -9,188 +9,246 @@
     <style>
         :root {
             --bg: #000000;
-            --card-bg: #1c1c1e;
-            --item-bg: #2c2c2e;
+            --card-bg: rgba(28, 28, 30, 0.6);
+            --item-bg: rgba(44, 44, 46, 0.6);
             --text: #ffffff;
             --text-sec: #8e8e93;
             --accent: #0a84ff;
-            --border: #38383a;
+            --danger: #ff453a;
+            --glass: blur(20px) saturate(180%);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding-bottom: 90px;
+            padding-bottom: 100px;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        /* HEADER */
+        /* GLASS HEADER */
         .header {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(28, 28, 30, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 16px;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border-bottom: 0.5px solid rgba(255,255,255,0.1);
+            padding: 16px;
+            transition: all 0.3s ease;
         }
 
-        .search-wrap { position: relative; width: 100%; }
+        .search-wrap { 
+            position: relative; width: 100%; 
+            transform: translateZ(0);
+        }
         .search-input {
-            width: 100%; padding: 10px 40px 10px 36px;
-            border-radius: 12px; border: none;
-            background: #2c2c2e; color: #fff; font-size: 16px;
+            width: 100%; padding: 14px 44px 14px 44px;
+            border-radius: 18px; border: none;
+            background: rgba(118, 118, 128, 0.24);
+            color: #fff; font-size: 17px;
+            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
-
-        /* CART BUTTON (Floating) */
-        .cart-float {
-            position: fixed; bottom: 20px; right: 20px;
-            width: 56px; height: 56px; border-radius: 28px;
-            background: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            z-index: 900; cursor: pointer;
-            transition: transform 0.2s;
+        .search-input:focus {
+            background: rgba(118, 118, 128, 0.4);
+            transform: scale(1.01);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .cart-float:active { transform: scale(0.9); }
-        .cart-badge {
-            position: absolute; top: -5px; right: -5px;
-            background: #ff3b30; color: #fff;
-            font-size: 12px; font-weight: bold;
-            padding: 4px 8px; border-radius: 10px;
-            min-width: 20px; text-align: center;
-            border: 2px solid var(--bg);
-        }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.6; font-size: 18px; }
 
-        /* ACCORDION STYLES */
-        .container { padding: 10px 0; }
+        /* ANIMATIONS */
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes tap { 0% { transform: scale(1); } 50% { transform: scale(0.96); } 100% { transform: scale(1); } }
 
-        /* Main Category (Level 1) */
-        .cat-row {
+        /* ACCORDION (iOS style lists) */
+        .container { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+        /* Main Category Card */
+        .cat-card {
             background: var(--card-bg);
-            padding: 16px; margin-bottom: 8px;
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 18px; font-weight: 700;
-            cursor: pointer; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            border-radius: 22px;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 0.5px solid rgba(255,255,255,0.08);
         }
-        .cat-row:first-child { border-top: none; }
-        .cat-icon { font-size: 24px; margin-right: 12px; }
-        .arrow { transition: transform 0.3s; color: var(--text-sec); font-size: 14px; }
-        .cat-row.expanded .arrow { transform: rotate(180deg); }
-
-        /* Subcategory Container (Level 2) */
-        .sub-container { display: none; background: var(--bg); }
-        .sub-container.visible { display: block; animation: fadeIn 0.3s; }
-
-        /* Subcategory Header (Clickable) */
-        .sub-header {
-            padding: 12px 16px 12px 24px;
-            color: var(--text);
-            font-size: 15px; font-weight: 600;
-            background: #1a1a1a;
-            border-bottom: 1px solid #222;
+        .cat-header {
+            padding: 20px;
             display: flex; align-items: center; justify-content: space-between;
+            font-size: 20px; font-weight: 700; letter-spacing: 0.3px;
             cursor: pointer;
+            background: rgba(255,255,255,0.03);
         }
-        .sub-header:active { background: #222; }
-        .sub-arrow { transition: transform 0.3s; color: var(--text-sec); font-size: 12px; }
-        .sub-header.expanded .sub-arrow { transform: rotate(180deg); }
-
-        /* Item List */
-        .item-list { 
-            padding: 0; 
-            display: none;
-            background: #000;
+        .cat-header:active { background: rgba(255,255,255,0.08); }
+        .cat-icon { font-size: 28px; margin-right: 14px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .arrow { 
+            font-size: 14px; color: rgba(235, 235, 245, 0.3); font-weight: 600; 
+            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1.3);
+            background: rgba(255,255,255,0.1); width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
         }
-        .item-list.visible { display: block; animation: fadeIn 0.2s; }
+        .cat-header.expanded .arrow { transform: rotate(180deg); background: var(--accent); color: #fff; }
 
-        /* Product Item */
+        /* Subcategories */
+        .sub-container { display: none; padding-bottom: 8px; }
+        .sub-container.visible { display: block; animation: slideIn 0.3s ease-out; }
+
+        .sub-group { margin: 0 12px 12px; border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.2); }
+
+        .sub-header {
+            padding: 16px;
+            font-size: 17px; font-weight: 600; color: rgba(255,255,255,0.9);
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; border-bottom: 0.5px solid rgba(255,255,255,0.05);
+        }
+        .sub-header:active { background: rgba(255,255,255,0.05); }
+        .sub-arrow { color: var(--text-sec); font-size: 12px; transition: transform 0.3s; }
+        .sub-header.expanded .sub-arrow { transform: rotate(180deg); color: var(--accent); }
+
+        /* Item Rows */
+        .item-list { display: none; }
+        .item-list.visible { display: block; }
+
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 16px 12px 32px;
-            border-bottom: 1px solid var(--border);
-            background: #000;
+            padding: 16px;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            background: rgba(30, 30, 32, 0.4);
+            transition: background 0.2s;
         }
-        .item-info { flex: 1; padding-right: 10px; }
-        .item-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-        .item-unit { font-size: 13px; color: var(--text-sec); }
+        .item-row:last-child { border-bottom: none; }
+        .item-info { flex: 1; padding-right: 14px; }
+        .item-name { 
+            font-size: 17px; font-weight: 500; color: #fff; line-height: 1.3;
+            letter-spacing: -0.2px;
+        }
 
-        /* Controls */
+        /* CONTROLS (BIGGER & BETTER) */
         .btn-add {
-            background: rgba(10, 132, 255, 0.15); color: var(--accent);
-            border: none; padding: 6px 14px; border-radius: 14px;
-            font-weight: 600; font-size: 14px; cursor: pointer;
-        }
-
-        .counter-wrap {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(10, 132, 255, 0.1);
-            padding: 4px 8px; border-radius: 12px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600; font-size: 15px;
+            box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+            transition: transform 0.1s;
             cursor: pointer;
         }
-        .counter-val { font-size: 16px; font-weight: 700; color: var(--accent); }
-        .counter-unit { font-size: 12px; color: var(--text-sec); }
+        .btn-add:active { transform: scale(0.94); box-shadow: 0 2px 6px rgba(10, 132, 255, 0.2); }
+
+        .counter-pill {
+            display: flex; align-items: center; gap: 2px;
+            background: rgba(60, 60, 65, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+        .counter-pill:active { transform: scale(0.96); }
+
+        .btn-mini {
+            width: 36px; height: 36px;
+            border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-minus { background: transparent; color: #ff453a; }
+        .btn-minus:active { background: rgba(255, 69, 58, 0.2); }
+        .btn-plus { background: #fff; color: #000; }
+        .btn-plus:active { background: #e5e5e5; }
+
+        .val-display {
+            min-width: 44px; text-align: center;
+            font-size: 16px; font-weight: 700; color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
 
         .btn-comment {
-            background: transparent; border: none; font-size: 18px; 
-            opacity: 0.3; margin-right: 8px; padding: 4px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: none;
+            color: #fff; font-size: 18px; margin-right: 10px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
         }
-        .btn-comment.active { opacity: 1; }
+        .btn-comment.active { background: var(--accent); box-shadow: 0 0 10px rgba(10,132,255,0.5); }
+        .btn-comment:active { transform: scale(0.9); }
 
-        /* MODALS */
+        /* FLOATING CART (Glassmorphism) */
+        .cart-bar {
+            position: fixed; bottom: 24px; left: 16px; right: 16px;
+            height: 64px;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 8px 0 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 900;
+            transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cart-bar.visible { transform: translateY(0); }
+
+        .cart-info { display: flex; flex-direction: column; }
+        .cart-count { font-size: 18px; font-weight: 700; color: #fff; }
+        .cart-sub { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; }
+
+        .btn-checkout {
+            background: #fff; color: #000;
+            border: none; padding: 0 24px; height: 48px;
+            border-radius: 24px;
+            font-weight: 700; font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+            transition: transform 0.2s;
+        }
+        .btn-checkout:active { transform: scale(0.94); }
+
+        /* MODALS (iOS Sheet) */
         .modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8); z-index: 2000;
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0,0,0,0.01); 
             display: none; align-items: flex-end;
-            backdrop-filter: blur(5px);
+            transition: background 0.3s;
         }
-        .modal.visible { display: flex; }
-        .modal-content {
-            background: #1c1c1e; width: 100%;
-            border-radius: 20px 20px 0 0; padding: 24px;
-            max-height: 85vh; overflow-y: auto;
-        }
-        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center; }
+        .modal.visible { background: rgba(0,0,0,0.6); display: flex; backdrop-filter: blur(4px); }
 
-        /* System Input */
-        .sys-input-wrap {
-            background: #000; border: 1px solid var(--accent);
-            border-radius: 12px; padding: 12px;
-            display: flex; align-items: center; margin: 20px 0;
+        .modal-card {
+            background: #1c1c1e; width: 100%;
+            border-radius: 28px 28px 0 0; padding: 24px 20px 40px;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.15, 0.9, 0.3, 1.1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
+        .modal.visible .modal-card { transform: translateY(0); }
+
+        .modal-drag { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 0 auto 20px; }
+
         .sys-input {
             width: 100%; background: transparent; border: none;
-            color: #fff; font-size: 32px; font-weight: 700;
-            text-align: center; outline: none;
+            color: #fff; font-size: 48px; font-weight: 800;
+            text-align: center; margin: 20px 0; outline: none;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
 
-        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-full {
-            flex: 1; padding: 14px; border-radius: 12px; border: none;
-            font-size: 16px; font-weight: 600; cursor: pointer;
+        .modal-btns { display: flex; gap: 12px; }
+        .btn-modal {
+            flex: 1; padding: 16px; border-radius: 18px; border: none;
+            font-size: 17px; font-weight: 600; cursor: pointer;
+            transition: transform 0.1s;
         }
-        .btn-grey { background: #3a3a3c; color: #fff; }
-        .btn-blue { background: var(--accent); color: #fff; }
+        .btn-modal:active { transform: scale(0.97); }
+        .btn-sec { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-prim { background: #fff; color: #000; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
 
-        /* Search Results Overlay */
-        .search-results {
-            display: none; padding-top: 10px;
-        }
-        .search-results.visible { display: block; }
-        .accordions-view.hidden { display: none; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .hidden { display: none !important; }
-
-        /* Order List */
-        .order-row {
-            display: flex; justify-content: space-between;
-            padding: 12px 0; border-bottom: 1px solid #333;
-        }
-        .order-name { font-weight: 500; font-size: 15px; }
-        .order-qty { font-weight: 700; white-space: nowrap; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -198,329 +256,310 @@
     <div class="header">
         <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" id="search" placeholder="Поиск товаров...">
+            <input type="text" class="search-input" id="search" placeholder="Поиск (например: авокадо)">
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Search Results (Hidden by default) -->
-        <div id="searchResults" class="search-results"></div>
-
-        <!-- Accordions View -->
-        <div id="accordionView" class="accordions-view"></div>
+        <div id="searchResults" class="search-results hidden" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <div id="accordionView"></div>
     </div>
 
-    <!-- Floating Cart -->
-    <div class="cart-float hidden" id="cartBtn" onclick="openOrderModal()">
-        <span style="font-size: 24px;">🛒</span>
-        <div class="cart-badge" id="cartBadge">0</div>
+    <!-- Glass Cart Bar -->
+    <div class="cart-bar" id="cartBar">
+        <div class="cart-info">
+            <span class="cart-count" id="cartCount">0 товаров</span>
+            <span class="cart-sub">Нажмите для заказа</span>
+        </div>
+        <button class="btn-checkout" onclick="openOrderModal()">Оформить ➔</button>
     </div>
 
     <!-- Input Modal -->
-    <div class="modal" id="inputModal">
-        <div class="modal-content">
-            <div class="modal-title">Укажите количество</div>
-            <div id="inputName" style="text-align: center; color: var(--text-sec); margin-bottom: 10px;"></div>
-            <div class="sys-input-wrap">
-                <input type="number" id="sysInput" class="sys-input" inputmode="decimal" placeholder="0">
-                <span id="inputUnit" style="font-size: 18px; color: var(--text-sec);"></span>
-            </div>
+    <div class="modal" id="inputModal" onclick="if(event.target===this) closeModal('inputModal')">
+        <div class="modal-card">
+            <div class="modal-drag"></div>
+            <div id="inputName" style="text-align: center; color: var(--text-sec); font-size:16px; font-weight:500;"></div>
+            <input type="number" id="sysInput" class="sys-input" inputmode="decimal" placeholder="0">
+            <div style="text-align:center; color:#555; margin-bottom:20px; font-size:14px;">Введите точное количество</div>
             <div class="modal-btns">
-                <button class="btn-full btn-grey" onclick="closeModal('inputModal')">Отмена</button>
-                <button class="btn-full btn-blue" onclick="saveInput()">Готово</button>
+                <button class="btn-modal btn-sec" onclick="closeModal('inputModal')">Отмена</button>
+                <button class="btn-modal btn-prim" onclick="saveInput()">Готово</button>
             </div>
         </div>
     </div>
 
     <!-- Comment Modal -->
-    <div class="modal" id="commentModal">
-        <div class="modal-content">
-            <div class="modal-title">Комментарий к товару</div>
-            <div id="comName" style="text-align: center; color: var(--text-sec); margin-bottom: 10px;"></div>
-            <textarea id="comText" style="width:100%; height:100px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; padding:12px; font-size:16px; resize:none;" placeholder="Ваш комментарий..."></textarea>
-            <div class="modal-btns">
-                <button class="btn-full btn-grey" onclick="closeModal('commentModal')">Отмена</button>
-                <button class="btn-full btn-blue" onclick="saveComment()">Сохранить</button>
+    <div class="modal" id="commentModal" onclick="if(event.target===this) closeModal('commentModal')">
+        <div class="modal-card">
+            <div class="modal-drag"></div>
+            <h3 style="text-align:center; margin-bottom:16px;">Комментарий</h3>
+            <textarea id="comText" style="width:100%; height:120px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:16px; padding:16px; font-size:17px; resize:none;" placeholder="Напишите пожелания..."></textarea>
+            <div class="modal-btns" style="margin-top:20px;">
+                <button class="btn-modal btn-sec" onclick="closeModal('commentModal')">Отмена</button>
+                <button class="btn-modal btn-prim" onclick="saveComment()">Сохранить</button>
             </div>
         </div>
     </div>
 
     <!-- Order Modal -->
-    <div class="modal" id="orderModal">
-        <div class="modal-content">
-            <div class="modal-title">Ваш заказ</div>
-            <div id="orderList" style="margin-bottom: 20px;"></div>
-            <textarea id="globalCom" style="width:100%; height:80px; background:#000; border:1px solid #333; color:#fff; border-radius:12px; padding:12px; font-size:16px;" placeholder="Общий комментарий к заказу..."></textarea>
-            <div class="modal-btns">
-                <button class="btn-full btn-grey" onclick="closeModal('orderModal')">Закрыть</button>
-                <button class="btn-full btn-blue" onclick="sendOrder()">Отправить</button>
-            </div>
+    <div class="modal" id="orderModal" onclick="if(event.target===this) closeModal('orderModal')">
+        <div class="modal-card" style="max-height:90vh;">
+            <div class="modal-drag"></div>
+            <h2 style="font-size:28px; font-weight:800; margin-bottom:20px;">Ваш заказ</h2>
+            <div id="orderList" style="margin-bottom: 24px; max-height:40vh; overflow-y:auto; padding-right:4px;"></div>
+            <textarea id="globalCom" style="width:100%; height:80px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:16px; padding:16px; font-size:16px; margin-bottom:20px;" placeholder="Общий комментарий к заказу..."></textarea>
+            <button class="btn-modal btn-prim" style="width:100%; padding:18px;" onclick="sendOrder()">Отправить в Telegram</button>
         </div>
     </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.setHeaderColor('#1c1c1e');
+    tg.setHeaderColor('#141414');
     tg.setBackgroundColor('#000000');
 
-    // === ДАННЫЕ (Без цен, сгруппированы) ===
+    // DATA
     const DB = {
-        "veg": {
-            "name": "Овощи", "icon": "🥦",
-            "subs": {
-                "roots": { "name": "Корнеплоды", "items": [
-                    { "id": "galan", "name": "Галангал корень", "unit": "кг" },
-                    { "id": "daik", "name": "Дайкон", "unit": "кг" },
-                    { "id": "imbir", "name": "Имбирь корень", "unit": "кг" },
-                    { "id": "mor_yel", "name": "Морковь желтая", "unit": "кг" },
-                    { "id": "mor_myt", "name": "Морковь мытая", "unit": "кг" },
-                    { "id": "mor_ros", "name": "Морковь Россия", "unit": "кг" },
-                    { "id": "mor_bot", "name": "Морковь с ботвой", "unit": "кг" },
-                    { "id": "past", "name": "Пастернак", "unit": "кг" },
-                    { "id": "rad_red", "name": "Редис красный", "unit": "кг" },
-                    { "id": "red_arb", "name": "Редька арбузная", "unit": "кг" },
-                    { "id": "rad_bot", "name": "Редис красный с ботвой", "unit": "кг" },
-                    { "id": "repa", "name": "Репа", "unit": "кг" },
-                    { "id": "svek", "name": "Свекла", "unit": "кг" },
-                    { "id": "seld_kor", "name": "Корень сельдерея", "unit": "кг" },
-                    { "id": "topin", "name": "Топинамбур", "unit": "кг" },
-                    { "id": "hren", "name": "Хрен корень", "unit": "кг" }
-                ]},
-                "tomatoes": { "name": "Томаты", "items": [
-                    { "id": "tom_kra", "name": "Томат Краснодар", "unit": "кг" },
-                    { "id": "tom_yel", "name": "Томат желтый", "unit": "кг" },
-                    { "id": "tom_slv", "name": "Томат красный сливка", "unit": "кг" },
-                    { "id": "tom_gri", "name": "Томат Гриль", "unit": "кг" },
-                    { "id": "tom_uzb_l", "name": "Томат Узбекистан (Люкс)", "unit": "кг" },
-                    { "id": "tom_uzb", "name": "Томат Узбекистан", "unit": "кг" },
-                    { "id": "tom_aze", "name": "Томат Азербайджан", "unit": "кг" },
-                    { "id": "tom_dag", "name": "Томат Дагестан", "unit": "кг" },
-                    { "id": "tom_che_y", "name": "Томат черри желтые", "unit": "кг" },
-                    { "id": "tom_che_r", "name": "Томат черри красный", "unit": "кг" },
-                    { "id": "tom_che_k", "name": "Томат черри кумато", "unit": "кг" },
-                    { "id": "tom_che_m", "name": "Томат черри медовые", "unit": "кг" },
-                    { "id": "tom_che_s", "name": "Томат черри мини сливка", "unit": "кг" },
-                    { "id": "tom_che_v", "name": "Томат черри на ветке", "unit": "кг" },
-                    { "id": "tom_che_mix", "name": "Томаты Черри Микс", "unit": "кг" },
-                    { "id": "tom_kum", "name": "Томат кумато", "unit": "кг" },
-                    { "id": "tom_ban", "name": "Томат Банч", "unit": "кг" }
-                ]},
-                "cucumbers": { "name": "Огурцы", "items": [
-                    { "id": "cuc_bak", "name": "Огурцы бакинские", "unit": "кг" },
-                    { "id": "cuc_lng", "name": "Огурец длинноплодный", "unit": "кг" },
-                    { "id": "cuc_kur", "name": "Огурцы Кураж", "unit": "кг" },
-                    { "id": "cuc_lux", "name": "Огурцы Люкс/Миринда", "unit": "кг" }
-                ]},
-                "potatoes": { "name": "Картофель", "items": [
-                    { "id": "pot_bat", "name": "Картофель Батат", "unit": "кг" },
-                    { "id": "pot_bab", "name": "Картофель бэби", "unit": "кг" },
-                    { "id": "pot_bab_s", "name": "Картофель бэби синеглазка", "unit": "кг" },
-                    { "id": "pot_gal", "name": "Картофель Гала", "unit": "кг" },
-                    { "id": "pot_gri", "name": "Картофель гриль", "unit": "кг" },
-                    { "id": "pot_red_d", "name": "Картофель красный (грязный)", "unit": "кг" },
-                    { "id": "pot_red_m", "name": "Картофель мытый красный", "unit": "кг" },
-                    { "id": "pot_myt", "name": "Картофель мытый", "unit": "кг" }
-                ]},
-                "cabbage": { "name": "Капуста", "items": [
-                    { "id": "cab_bk", "name": "Капуста б/к", "unit": "кг" },
-                    { "id": "cab_bro", "name": "Капуста брокколи", "unit": "кг" },
-                    { "id": "cab_bro_cal", "name": "Капуста брокколи (калибр)", "unit": "кг" },
-                    { "id": "cab_bru", "name": "Капуста брюссельская", "unit": "кг" },
-                    { "id": "cab_kol", "name": "Капуста кольраби", "unit": "кг" },
-                    { "id": "cab_red", "name": "Капуста краснокочанная", "unit": "кг" },
-                    { "id": "cab_mol", "name": "Капуста молодая", "unit": "кг" },
-                    { "id": "cab_mol_s", "name": "Капуста молодая салатная", "unit": "кг" },
-                    { "id": "cab_pek", "name": "Капуста Пекинская", "unit": "кг" },
-                    { "id": "cab_sav", "name": "Капуста Савойская", "unit": "кг" },
-                    { "id": "cab_col", "name": "Капуста цветная", "unit": "кг" },
-                    { "id": "cab_col_cal", "name": "Капуста цветная (калибр)", "unit": "кг" },
-                    { "id": "kale", "name": "Кейл", "unit": "кг" }
-                ]},
-                "onions": { "name": "Лук и Чеснок", "items": [
-                    { "id": "luk_wh", "name": "Лук белый", "unit": "кг" },
-                    { "id": "luk_gr_kor", "name": "Лук зеленый с корешками", "unit": "кг" },
-                    { "id": "luk_gr", "name": "Лук зеленый", "unit": "кг" },
-                    { "id": "luk_red", "name": "Лук красный", "unit": "кг" },
-                    { "id": "luk_yal", "name": "Лук крымский", "unit": "кг" },
-                    { "id": "luk_por", "name": "Лук порей", "unit": "кг" },
-                    { "id": "luk_rep", "name": "Лук репчатый", "unit": "кг" },
-                    { "id": "luk_rep_big", "name": "Лук репчатый крупный", "unit": "кг" },
-                    { "id": "luk_sib", "name": "Лук сибулет", "unit": "кг" },
-                    { "id": "luk_sha", "name": "Лук шалот", "unit": "кг" },
-                    { "id": "ches", "name": "Чеснок", "unit": "кг" },
-                    { "id": "ches_mol", "name": "Чеснок молодой", "unit": "кг" }
-                ]},
-                "peppers": { "name": "Перцы", "items": [
-                    { "id": "pep_yel", "name": "Перец болгарский желтый", "unit": "кг" },
-                    { "id": "pep_grn", "name": "Перец болгарский зеленый", "unit": "кг" },
-                    { "id": "pep_red", "name": "Перец болгарский красный", "unit": "кг" },
-                    { "id": "pep_gr_red", "name": "Перец грунт красный", "unit": "кг" },
-                    { "id": "pep_ram", "name": "Перец Рамиро", "unit": "кг" },
-                    { "id": "chil_gr_arm", "name": "Перец Чили зеленый (Арм)", "unit": "кг" },
-                    { "id": "chil_gr", "name": "Перец Чили зеленый", "unit": "кг" },
-                    { "id": "chil_rd", "name": "Перец Чили красный", "unit": "кг" },
-                    { "id": "chil_thai", "name": "Перец Чили Тайский (80г)", "unit": "уп" }
-                ]},
-                "other": { "name": "Другие овощи", "items": [
-                    { "id": "art_gr", "name": "Артишоки зеленые", "unit": "кг" },
-                    { "id": "art_vi", "name": "Артишоки фиолетовые", "unit": "кг" },
-                    { "id": "bakl", "name": "Баклажан", "unit": "кг" },
-                    { "id": "bakl_gr", "name": "Баклажан грунтовой", "unit": "кг" },
-                    { "id": "goroh", "name": "Горох стручковый (Кения)", "unit": "кг" },
-                    { "id": "kab_wh", "name": "Кабачок белый", "unit": "кг" },
-                    { "id": "kuk", "name": "Кукуруза свежая", "unit": "кг" },
-                    { "id": "seld_st", "name": "Стебель сельдерея", "unit": "кг" },
-                    { "id": "spar", "name": "Спаржа зеленая", "unit": "кг" },
-                    { "id": "tyk_bat", "name": "Тыква Баттернат", "unit": "кг" },
-                    { "id": "tyk_rou", "name": "Тыква круглая", "unit": "кг" },
-                    { "id": "fasol", "name": "Фасоль стручковая (Кения)", "unit": "кг" },
-                    { "id": "fenhel", "name": "Фенхель", "unit": "кг" },
-                    { "id": "zuk", "name": "Цуккини зеленые", "unit": "кг" }
-                ]}
-            }
-        },
-        "grn": {
-            "name": "Зелень", "icon": "🌿",
-            "subs": {
-                "spicy": { "name": "Пряные травы", "items": [
-                    { "id": "baz_pot", "name": "Базилик в горшочке", "unit": "шт" },
-                    { "id": "baz_gr_iz", "name": "Базилик зеленый (Израиль)", "unit": "кг" },
-                    { "id": "baz_rd", "name": "Базилик красный", "unit": "кг" },
-                    { "id": "kerv", "name": "Кервель", "unit": "кг" },
-                    { "id": "kinza", "name": "Кинза", "unit": "кг" },
-                    { "id": "myata", "name": "Мята свежая", "unit": "кг" },
-                    { "id": "petr", "name": "Петрушка", "unit": "кг" },
-                    { "id": "petr_kud", "name": "Петрушка кудрявая", "unit": "кг" },
-                    { "id": "rozm", "name": "Розмарин", "unit": "кг" },
-                    { "id": "tim", "name": "Тимьян", "unit": "кг" },
-                    { "id": "ukr", "name": "Укроп", "unit": "кг" },
-                    { "id": "shal", "name": "Шалфей", "unit": "кг" },
-                    { "id": "estr", "name": "Эстрагон", "unit": "кг" }
-                ]},
-                "lettuce": { "name": "Салаты", "items": [
-                    { "id": "mang_gr", "name": "Мангольд зеленый (125г)", "unit": "уп" },
-                    { "id": "mang_rd", "name": "Мангольд фиолетовый (125г)", "unit": "уп" },
-                    { "id": "mix_sal", "name": "Микс салат", "unit": "кг" },
-                    { "id": "min_spin", "name": "Мини шпинат (125г)", "unit": "уп" },
-                    { "id": "rost_soi", "name": "Ростки сои", "unit": "кг" },
-                    { "id": "sal_ice", "name": "Салат Айсберг", "unit": "кг" },
-                    { "id": "sal_corn", "name": "Салат корн (125гр)", "unit": "уп" },
-                    { "id": "sal_lat", "name": "Салат латук", "unit": "кг" },
-                    { "id": "sal_lol", "name": "Салат Лолло Россо", "unit": "кг" },
-                    { "id": "sal_pak", "name": "Салат Пак Чой", "unit": "кг" },
-                    { "id": "sal_pak_min", "name": "Салат Пак Чой мини", "unit": "кг" },
-                    { "id": "sal_rad", "name": "Салат Радичио", "unit": "кг" },
-                    { "id": "sal_rom", "name": "Салат Романо", "unit": "кг" },
-                    { "id": "sal_rom_min", "name": "Салат Романо мини", "unit": "кг" },
-                    { "id": "sal_ruk", "name": "Салат Руккола вес", "unit": "кг" },
-                    { "id": "sal_ruk_lux", "name": "Салат Руккола Люкс (125г)", "unit": "уп" },
-                    { "id": "sal_fri", "name": "Салат Фризе", "unit": "кг" },
-                    { "id": "sal_fril", "name": "Салат Фриллис", "unit": "кг" },
-                    { "id": "sal_mos", "name": "Салат московский", "unit": "кг" },
-                    { "id": "sats", "name": "Сацимати", "unit": "кг" },
-                    { "id": "spin", "name": "Шпинат", "unit": "кг" },
-                    { "id": "shav", "name": "Щавель", "unit": "кг" }
-                ]},
-                "micro": { "name": "Микрозелень", "items": [
-                    { "id": "mic_an", "name": "Микрозелень Анютины глазки", "unit": "уп" },
-                    { "id": "mic_baz", "name": "Микрозелень Базилик зеленый", "unit": "уп" },
-                    { "id": "mic_vas", "name": "Микрозелень Василек", "unit": "уп" },
-                    { "id": "mic_gor", "name": "Микрозелень горох", "unit": "уп" },
-                    { "id": "mic_kis", "name": "Микрозелень Кислица", "unit": "уп" },
-                    { "id": "mic_kor", "name": "Микрозелень Кориандр", "unit": "уп" },
-                    { "id": "mic_mel", "name": "Микрозелень Мелисса", "unit": "уп" },
-                    { "id": "mic_shav", "name": "Микрозелень щавель", "unit": "уп" }
-                ]},
-                "exotic_grn": { "name": "Экзотика", "items": [
-                    { "id": "lemon", "name": "Лемонграсс", "unit": "кг" },
-                    { "id": "list_bam", "name": "Лист бамбука", "unit": "кг" },
-                    { "id": "list_ban", "name": "Лист банана", "unit": "кг" },
-                    { "id": "list_lime", "name": "Лист лайма (100г)", "unit": "уп" },
-                    { "id": "list_svek", "name": "Лист свеклы", "unit": "кг" },
-                    { "id": "list_seld", "name": "Листья сельдерея", "unit": "кг" }
-                ]}
-            }
-        },
-        "fru": {
-            "name": "Фрукты", "icon": "🍎",
-            "subs": {
-                "citrus": { "name": "Цитрусовые", "items": [
-                    { "id": "apel", "name": "Апельсин", "unit": "кг" },
-                    { "id": "apel_soc", "name": "Апельсин для сока", "unit": "кг" },
-                    { "id": "apel_red", "name": "Апельсин красный", "unit": "кг" },
-                    { "id": "grape", "name": "Грейпфрут", "unit": "кг" },
-                    { "id": "kum", "name": "Кумкват", "unit": "кг" },
-                    { "id": "lime", "name": "Лайм", "unit": "кг" },
-                    { "id": "limon", "name": "Лимон", "unit": "кг" },
-                    { "id": "lim_uzb", "name": "Лимон Узбекистан", "unit": "кг" },
-                    { "id": "mand_abh", "name": "Мандарин Абхазия", "unit": "кг" },
-                    { "id": "mand", "name": "Мандарин", "unit": "кг" },
-                    { "id": "mand_vet", "name": "Мандарины на веточке", "unit": "кг" },
-                    { "id": "pomelo", "name": "Помело", "unit": "кг" }
-                ]},
-                "exotic": { "name": "Экзотика", "items": [
-                    { "id": "avo", "name": "Авокадо", "unit": "кг" },
-                    { "id": "avo_has", "name": "Авокадо Хасс", "unit": "кг" },
-                    { "id": "avo_rou", "name": "Авокадо круглый", "unit": "кг" },
-                    { "id": "anan", "name": "Ананас Голд", "unit": "кг" },
-                    { "id": "anan_prem", "name": "Ананас премиум", "unit": "кг" },
-                    { "id": "banan", "name": "Банан", "unit": "кг" },
-                    { "id": "kiwi", "name": "Киви", "unit": "кг" },
-                    { "id": "kiwi_gold", "name": "Киви Голд", "unit": "кг" },
-                    { "id": "mango_per", "name": "Манго премиум Перу", "unit": "кг" },
-                    { "id": "mango_eg", "name": "Манго Египет", "unit": "кг" },
-                    { "id": "mara", "name": "Маракуйя", "unit": "кг" },
-                    { "id": "papa", "name": "Папайя", "unit": "кг" },
-                    { "id": "pita_red", "name": "Питахайя красная", "unit": "кг" },
-                    { "id": "pita_wh", "name": "Питахайя белая", "unit": "кг" },
-                    { "id": "fei", "name": "Фейхоа", "unit": "кг" },
-                    { "id": "hurma", "name": "Хурма", "unit": "кг" },
-                    { "id": "hurma_isp", "name": "Хурма Испания", "unit": "кг" }
-                ]},
-                "classic": { "name": "Классика", "items": [
-                    { "id": "aiva", "name": "Айва", "unit": "кг" },
-                    { "id": "vin_wh", "name": "Виноград белый б/к", "unit": "кг" },
-                    { "id": "vin_rd", "name": "Виноград красный б/к", "unit": "кг" },
-                    { "id": "vin_gr_ch", "name": "Виноград Зеленый (Китай)", "unit": "кг" },
-                    { "id": "gran", "name": "Гранат", "unit": "кг" },
-                    { "id": "gran_soc", "name": "Гранат соковый", "unit": "кг" },
-                    { "id": "gru_con", "name": "Груша конференция", "unit": "кг" },
-                    { "id": "gru_for", "name": "Груша Форель", "unit": "кг" },
-                    { "id": "gru_chi", "name": "Груша китайская", "unit": "кг" },
-                    { "id": "sliva", "name": "Слива черная", "unit": "кг" },
-                    { "id": "yab_gol", "name": "Яблоки Голден", "unit": "кг" },
-                    { "id": "yab_gre", "name": "Яблоки Гренни Смит", "unit": "кг" },
-                    { "id": "yab_red", "name": "Яблоки красные Айдаред", "unit": "кг" },
-                    { "id": "yab_sem", "name": "Яблоки Семеренко", "unit": "кг" }
-                ]}
-            }
-        },
-        "ber": {
-            "name": "Ягоды", "icon": "🍓",
-            "subs": {
-                "all": { "name": "Все ягоды", "items": [
-                    { "id": "golub", "name": "Голубика", "unit": "кг" },
-                    { "id": "eje", "name": "Ежевика", "unit": "кг" },
-                    { "id": "klub", "name": "Клубника", "unit": "кг" },
-                    { "id": "malina", "name": "Малина", "unit": "кг" },
-                    { "id": "smor", "name": "Смородина красная", "unit": "кг" },
-                    { "id": "fiz", "name": "Физалис", "unit": "шт" }
-                ]}
-            }
-        },
-        "mus": {
-            "name": "Грибы", "icon": "🍄",
-            "subs": {
-                "all": { "name": "Все грибы", "items": [
-                    { "id": "vesh", "name": "Вешенки", "unit": "кг" },
-                    { "id": "shamp", "name": "Шампиньоны", "unit": "кг" },
-                    { "id": "shiit", "name": "Грибы Шиитаки", "unit": "кг" },
-                    { "id": "shim", "name": "Грибы Шимиджи (150г)", "unit": "шт" }
-                ]}
-            }
-        }
+        "veg": { "name": "Овощи", "icon": "🥦", "subs": {
+            "roots": { "name": "Корнеплоды", "items": [
+                { "id": "galan", "name": "Галангал корень", "u": "кг" },
+                { "id": "daik", "name": "Дайкон", "u": "кг" },
+                { "id": "imbir", "name": "Имбирь корень", "u": "кг" },
+                { "id": "mor_yel", "name": "Морковь желтая", "u": "кг" },
+                { "id": "mor_myt", "name": "Морковь мытая", "u": "кг" },
+                { "id": "mor_ros", "name": "Морковь Россия", "u": "кг" },
+                { "id": "mor_bot", "name": "Морковь с ботвой", "u": "кг" },
+                { "id": "past", "name": "Пастернак", "u": "кг" },
+                { "id": "rad_red", "name": "Редис красный", "u": "кг" },
+                { "id": "red_arb", "name": "Редька арбузная", "u": "кг" },
+                { "id": "rad_bot", "name": "Редис с ботвой", "u": "кг" },
+                { "id": "repa", "name": "Репа", "u": "кг" },
+                { "id": "svek", "name": "Свекла", "u": "кг" },
+                { "id": "seld_kor", "name": "Корень сельдерея", "u": "кг" },
+                { "id": "topin", "name": "Топинамбур", "u": "кг" },
+                { "id": "hren", "name": "Хрен корень", "u": "кг" }
+            ]},
+            "tomatoes": { "name": "Томаты", "items": [
+                { "id": "tom_kra", "name": "Томат Краснодар", "u": "кг" },
+                { "id": "tom_yel", "name": "Томат желтый", "u": "кг" },
+                { "id": "tom_slv", "name": "Томат красный сливка", "u": "кг" },
+                { "id": "tom_gri", "name": "Томат Гриль", "u": "кг" },
+                { "id": "tom_uzb_l", "name": "Томат Узбекистан (Люкс)", "u": "кг" },
+                { "id": "tom_uzb", "name": "Томат Узбекистан", "u": "кг" },
+                { "id": "tom_aze", "name": "Томат Азербайджан", "u": "кг" },
+                { "id": "tom_dag", "name": "Томат Дагестан", "u": "кг" },
+                { "id": "tom_che_y", "name": "Черри желтые", "u": "кг" },
+                { "id": "tom_che_r", "name": "Черри красные", "u": "кг" },
+                { "id": "tom_che_k", "name": "Черри кумато", "u": "кг" },
+                { "id": "tom_che_m", "name": "Черри медовые", "u": "кг" },
+                { "id": "tom_che_s", "name": "Черри мини сливка", "u": "кг" },
+                { "id": "tom_che_v", "name": "Черри на ветке", "u": "кг" },
+                { "id": "tom_che_mix", "name": "Черри Микс", "u": "кг" },
+                { "id": "tom_kum", "name": "Томат кумато", "u": "кг" },
+                { "id": "tom_ban", "name": "Томат Банч", "u": "кг" }
+            ]},
+            "cucumbers": { "name": "Огурцы", "items": [
+                { "id": "cuc_bak", "name": "Огурцы бакинские", "u": "кг" },
+                { "id": "cuc_lng", "name": "Огурец длинноплодный", "u": "кг" },
+                { "id": "cuc_kur", "name": "Огурцы Кураж", "u": "кг" },
+                { "id": "cuc_lux", "name": "Огурцы Люкс/Миринда", "u": "кг" }
+            ]},
+            "potatoes": { "name": "Картофель", "items": [
+                { "id": "pot_bat", "name": "Батат", "u": "кг" },
+                { "id": "pot_bab", "name": "Бэби", "u": "кг" },
+                { "id": "pot_bab_s", "name": "Бэби синеглазка", "u": "кг" },
+                { "id": "pot_gal", "name": "Гала", "u": "кг" },
+                { "id": "pot_gri", "name": "Гриль", "u": "кг" },
+                { "id": "pot_red_d", "name": "Красный (грязный)", "u": "кг" },
+                { "id": "pot_red_m", "name": "Красный (мытый)", "u": "кг" },
+                { "id": "pot_myt", "name": "Мытый", "u": "кг" }
+            ]},
+            "cabbage": { "name": "Капуста", "items": [
+                { "id": "cab_bk", "name": "Капуста б/к", "u": "кг" },
+                { "id": "cab_bro", "name": "Брокколи", "u": "кг" },
+                { "id": "cab_bro_cal", "name": "Брокколи (калибр)", "u": "кг" },
+                { "id": "cab_bru", "name": "Брюссельская", "u": "кг" },
+                { "id": "cab_kol", "name": "Кольраби", "u": "кг" },
+                { "id": "cab_red", "name": "Краснокочанная", "u": "кг" },
+                { "id": "cab_mol", "name": "Молодая", "u": "кг" },
+                { "id": "cab_mol_s", "name": "Молодая салатная", "u": "кг" },
+                { "id": "cab_pek", "name": "Пекинская", "u": "кг" },
+                { "id": "cab_sav", "name": "Савойская", "u": "кг" },
+                { "id": "cab_col", "name": "Цветная", "u": "кг" },
+                { "id": "cab_col_cal", "name": "Цветная (калибр)", "u": "кг" },
+                { "id": "kale", "name": "Кейл", "u": "кг" }
+            ]},
+            "onions": { "name": "Лук и Чеснок", "items": [
+                { "id": "luk_wh", "name": "Лук белый", "u": "кг" },
+                { "id": "luk_gr_kor", "name": "Лук зеленый (с корнем)", "u": "кг" },
+                { "id": "luk_gr", "name": "Лук зеленый", "u": "кг" },
+                { "id": "luk_red", "name": "Лук красный", "u": "кг" },
+                { "id": "luk_yal", "name": "Лук крымский", "u": "кг" },
+                { "id": "luk_por", "name": "Лук порей", "u": "кг" },
+                { "id": "luk_rep", "name": "Лук репчатый", "u": "кг" },
+                { "id": "luk_rep_big", "name": "Лук репчатый крупный", "u": "кг" },
+                { "id": "luk_sib", "name": "Лук сибулет", "u": "кг" },
+                { "id": "luk_sha", "name": "Лук шалот", "u": "кг" },
+                { "id": "ches", "name": "Чеснок", "u": "кг" },
+                { "id": "ches_mol", "name": "Чеснок молодой", "u": "кг" }
+            ]},
+            "peppers": { "name": "Перцы", "items": [
+                { "id": "pep_yel", "name": "Перец болгарский желтый", "u": "кг" },
+                { "id": "pep_grn", "name": "Перец болгарский зеленый", "u": "кг" },
+                { "id": "pep_red", "name": "Перец болгарский красный", "u": "кг" },
+                { "id": "pep_gr_red", "name": "Перец грунт красный", "u": "кг" },
+                { "id": "pep_ram", "name": "Перец Рамиро", "u": "кг" },
+                { "id": "chil_gr_arm", "name": "Чили зеленый (Арм)", "u": "кг" },
+                { "id": "chil_gr", "name": "Чили зеленый", "u": "кг" },
+                { "id": "chil_rd", "name": "Чили красный", "u": "кг" },
+                { "id": "chil_thai", "name": "Чили Тайский (80г)", "u": "уп" }
+            ]},
+            "other": { "name": "Другие овощи", "items": [
+                { "id": "art_gr", "name": "Артишоки зеленые", "u": "кг" },
+                { "id": "art_vi", "name": "Артишоки фиолетовые", "u": "кг" },
+                { "id": "bakl", "name": "Баклажан", "u": "кг" },
+                { "id": "bakl_gr", "name": "Баклажан грунтовой", "u": "кг" },
+                { "id": "goroh", "name": "Горох стручковый (Кения)", "u": "кг" },
+                { "id": "kab_wh", "name": "Кабачок белый", "u": "кг" },
+                { "id": "kuk", "name": "Кукуруза свежая", "u": "кг" },
+                { "id": "seld_st", "name": "Стебель сельдерея", "u": "кг" },
+                { "id": "spar", "name": "Спаржа зеленая", "u": "кг" },
+                { "id": "tyk_bat", "name": "Тыква Баттернат", "u": "кг" },
+                { "id": "tyk_rou", "name": "Тыква круглая", "u": "кг" },
+                { "id": "fasol", "name": "Фасоль стручковая", "u": "кг" },
+                { "id": "fenhel", "name": "Фенхель", "u": "кг" },
+                { "id": "zuk", "name": "Цуккини зеленые", "u": "кг" }
+            ]}
+        }},
+        "grn": { "name": "Зелень", "icon": "🌿", "subs": {
+            "spicy": { "name": "Пряные травы", "items": [
+                { "id": "baz_pot", "name": "Базилик в горшочке", "u": "шт" },
+                { "id": "baz_gr_iz", "name": "Базилик зеленый", "u": "кг" },
+                { "id": "baz_rd", "name": "Базилик красный", "u": "кг" },
+                { "id": "kerv", "name": "Кервель", "u": "кг" },
+                { "id": "kinza", "name": "Кинза", "u": "кг" },
+                { "id": "myata", "name": "Мята свежая", "u": "кг" },
+                { "id": "petr", "name": "Петрушка", "u": "кг" },
+                { "id": "petr_kud", "name": "Петрушка кудрявая", "u": "кг" },
+                { "id": "rozm", "name": "Розмарин", "u": "кг" },
+                { "id": "tim", "name": "Тимьян", "u": "кг" },
+                { "id": "ukr", "name": "Укроп", "u": "кг" },
+                { "id": "shal", "name": "Шалфей", "u": "кг" },
+                { "id": "estr", "name": "Эстрагон", "u": "кг" }
+            ]},
+            "lettuce": { "name": "Салаты", "items": [
+                { "id": "mang_gr", "name": "Мангольд зеленый (125г)", "u": "уп" },
+                { "id": "mang_rd", "name": "Мангольд фиолетовый", "u": "уп" },
+                { "id": "mix_sal", "name": "Микс салат", "u": "кг" },
+                { "id": "min_spin", "name": "Мини шпинат (125г)", "u": "уп" },
+                { "id": "rost_soi", "name": "Ростки сои", "u": "кг" },
+                { "id": "sal_ice", "name": "Салат Айсберг", "u": "кг" },
+                { "id": "sal_corn", "name": "Салат корн (125г)", "u": "уп" },
+                { "id": "sal_lat", "name": "Салат латук", "u": "кг" },
+                { "id": "sal_lol", "name": "Салат Лолло Россо", "u": "кг" },
+                { "id": "sal_pak", "name": "Салат Пак Чой", "u": "кг" },
+                { "id": "sal_pak_min", "name": "Салат Пак Чой мини", "u": "кг" },
+                { "id": "sal_rad", "name": "Салат Радичио", "u": "кг" },
+                { "id": "sal_rom", "name": "Салат Романо", "u": "кг" },
+                { "id": "sal_rom_min", "name": "Салат Романо мини", "u": "кг" },
+                { "id": "sal_ruk", "name": "Руккола вес", "u": "кг" },
+                { "id": "sal_ruk_lux", "name": "Руккола Люкс (125г)", "u": "уп" },
+                { "id": "sal_fri", "name": "Салат Фризе", "u": "кг" },
+                { "id": "sal_fril", "name": "Салат Фриллис", "u": "кг" },
+                { "id": "sal_mos", "name": "Салат московский", "u": "кг" },
+                { "id": "sats", "name": "Сацимати", "u": "кг" },
+                { "id": "spin", "name": "Шпинат", "u": "кг" },
+                { "id": "shav", "name": "Щавель", "u": "кг" }
+            ]},
+            "micro": { "name": "Микрозелень (уп)", "items": [
+                { "id": "mic_an", "name": "Анютины глазки", "u": "уп" },
+                { "id": "mic_baz", "name": "Базилик зеленый", "u": "уп" },
+                { "id": "mic_vas", "name": "Василек", "u": "уп" },
+                { "id": "mic_gor", "name": "Горох", "u": "уп" },
+                { "id": "mic_kis", "name": "Кислица", "u": "уп" },
+                { "id": "mic_kor", "name": "Кориандр", "u": "уп" },
+                { "id": "mic_mel", "name": "Мелисса", "u": "уп" },
+                { "id": "mic_shav", "name": "Щавель", "u": "уп" }
+            ]},
+            "exotic_grn": { "name": "Экзотика", "items": [
+                { "id": "lemon", "name": "Лемонграсс", "u": "кг" },
+                { "id": "list_bam", "name": "Лист бамбука", "u": "кг" },
+                { "id": "list_ban", "name": "Лист банана", "u": "кг" },
+                { "id": "list_lime", "name": "Лист лайма (100г)", "u": "уп" },
+                { "id": "list_svek", "name": "Лист свеклы", "u": "кг" },
+                { "id": "list_seld", "name": "Листья сельдерея", "u": "кг" }
+            ]}
+        }},
+        "fru": { "name": "Фрукты", "icon": "🍎", "subs": {
+            "citrus": { "name": "Цитрусовые", "items": [
+                { "id": "apel", "name": "Апельсин", "u": "кг" },
+                { "id": "apel_soc", "name": "Апельсин для сока", "u": "кг" },
+                { "id": "apel_red", "name": "Апельсин красный", "u": "кг" },
+                { "id": "grape", "name": "Грейпфрут", "u": "кг" },
+                { "id": "kum", "name": "Кумкват", "u": "кг" },
+                { "id": "lime", "name": "Лайм", "u": "кг" },
+                { "id": "limon", "name": "Лимон", "u": "кг" },
+                { "id": "lim_uzb", "name": "Лимон Узбекистан", "u": "кг" },
+                { "id": "mand_abh", "name": "Мандарин Абхазия", "u": "кг" },
+                { "id": "mand", "name": "Мандарин", "u": "кг" },
+                { "id": "mand_vet", "name": "Мандарины на веточке", "u": "кг" },
+                { "id": "pomelo", "name": "Помело", "u": "кг" }
+            ]},
+            "exotic": { "name": "Экзотика", "items": [
+                { "id": "avo", "name": "Авокадо", "u": "кг" },
+                { "id": "avo_has", "name": "Авокадо Хасс", "u": "кг" },
+                { "id": "avo_rou", "name": "Авокадо круглый", "u": "кг" },
+                { "id": "anan", "name": "Ананас Голд", "u": "кг" },
+                { "id": "anan_prem", "name": "Ананас премиум", "u": "кг" },
+                { "id": "banan", "name": "Банан", "u": "кг" },
+                { "id": "kiwi", "name": "Киви", "u": "кг" },
+                { "id": "kiwi_gold", "name": "Киви Голд", "u": "кг" },
+                { "id": "mango_per", "name": "Манго премиум Перу", "u": "кг" },
+                { "id": "mango_eg", "name": "Манго Египет", "u": "кг" },
+                { "id": "mara", "name": "Маракуйя", "u": "кг" },
+                { "id": "papa", "name": "Папайя", "u": "кг" },
+                { "id": "pita_red", "name": "Питахайя красная", "u": "кг" },
+                { "id": "pita_wh", "name": "Питахайя белая", "u": "кг" },
+                { "id": "fei", "name": "Фейхоа", "u": "кг" },
+                { "id": "hurma", "name": "Хурма", "u": "кг" },
+                { "id": "hurma_isp", "name": "Хурма Испания", "u": "кг" }
+            ]},
+            "classic": { "name": "Классика", "items": [
+                { "id": "aiva", "name": "Айва", "u": "кг" },
+                { "id": "vin_wh", "name": "Виноград белый б/к", "u": "кг" },
+                { "id": "vin_rd", "name": "Виноград красный б/к", "u": "кг" },
+                { "id": "vin_gr_ch", "name": "Виноград Зеленый", "u": "кг" },
+                { "id": "gran", "name": "Гранат", "u": "кг" },
+                { "id": "gran_soc", "name": "Гранат соковый", "u": "кг" },
+                { "id": "gru_con", "name": "Груша конференция", "u": "кг" },
+                { "id": "gru_for", "name": "Груша Форель", "u": "кг" },
+                { "id": "gru_chi", "name": "Груша китайская", "u": "кг" },
+                { "id": "sliva", "name": "Слива черная", "u": "кг" },
+                { "id": "yab_gol", "name": "Яблоки Голден", "u": "кг" },
+                { "id": "yab_gre", "name": "Яблоки Гренни Смит", "u": "кг" },
+                { "id": "yab_red", "name": "Яблоки Айдаред", "u": "кг" },
+                { "id": "yab_sem", "name": "Яблоки Семеренко", "u": "кг" }
+            ]}
+        }},
+        "ber": { "name": "Ягоды", "icon": "🍓", "subs": {
+            "all": { "name": "Все ягоды", "items": [
+                { "id": "golub", "name": "Голубика", "u": "кг" },
+                { "id": "eje", "name": "Ежевика", "u": "кг" },
+                { "id": "klub", "name": "Клубника", "u": "кг" },
+                { "id": "malina", "name": "Малина", "u": "кг" },
+                { "id": "smor", "name": "Смородина красная", "u": "кг" },
+                { "id": "fiz", "name": "Физалис", "u": "шт" }
+            ]}
+        }},
+        "mus": { "name": "Грибы", "icon": "🍄", "subs": {
+            "all": { "name": "Все грибы", "items": [
+                { "id": "vesh", "name": "Вешенки", "u": "кг" },
+                { "id": "shamp", "name": "Шампиньоны", "u": "кг" },
+                { "id": "shiit", "name": "Грибы Шиитаки", "u": "кг" },
+                { "id": "shim", "name": "Грибы Шимиджи (150г)", "u": "шт" }
+            ]}
+        }}
     };
 
     let cart = {}, comments = {};
@@ -529,11 +568,7 @@
     function init() {
         Object.keys(DB).forEach(k => {
             const cat = DB[k];
-            if(cat.subs) {
-                Object.values(cat.subs).forEach(s => {
-                    s.items.forEach(i => allItems.push({...i, cat:k}));
-                });
-            }
+            if(cat.subs) Object.values(cat.subs).forEach(s => s.items.forEach(i => allItems.push({...i, cat:k})));
         });
         fuse = new Fuse(allItems, { keys:['name'], threshold:0.3 });
 
@@ -541,70 +576,64 @@
         setupSearch();
     }
 
-    // === ACCORDION RENDER ===
     function renderAccordion() {
         const c = document.getElementById('accordionView');
         c.innerHTML = '';
 
         Object.keys(DB).forEach(catKey => {
             const cat = DB[catKey];
+            const div = document.createElement('div');
+            div.className = 'cat-card';
 
-            const catDiv = document.createElement('div');
-            catDiv.innerHTML = `
-                <div class="cat-row" onclick="toggleCat('${catKey}', this)">
-                    <div><span class="cat-icon">${cat.icon}</span>${cat.name}</div>
-                    <span class="arrow">▼</span>
+            div.innerHTML = `
+                <div class="cat-header" onclick="toggleCat(this)">
+                    <div style="display:flex; align-items:center;">
+                        <span class="cat-icon">${cat.icon}</span>${cat.name}
+                    </div>
+                    <div class="arrow">↓</div>
                 </div>
-                <div id="cat-${catKey}" class="sub-container"></div>
+                <div class="sub-container"></div>
             `;
-            c.appendChild(catDiv);
+            c.appendChild(div);
 
-            const subCont = catDiv.querySelector(`#cat-${catKey}`);
+            const subCont = div.querySelector('.sub-container');
             if(cat.subs) {
                 Object.keys(cat.subs).forEach(subKey => {
                     const sub = cat.subs[subKey];
                     const isSingle = Object.keys(cat.subs).length === 1 && subKey === 'all';
 
-                    const subDiv = document.createElement('div');
+                    const group = document.createElement('div');
+                    group.className = 'sub-group';
 
                     if(isSingle) {
-                        // Если только одна подкатегория "Все", показать товары сразу
-                        subDiv.innerHTML = `<div class="item-list visible" id="list-${catKey}-${subKey}"></div>`;
+                        group.innerHTML = `<div class="item-list visible" id="list-${catKey}-${subKey}"></div>`;
                     } else {
-                        // Если несколько подкатегорий - делаем выпадающими
-                        subDiv.innerHTML = `
-                            <div class="sub-header" onclick="toggleSub('${catKey}', '${subKey}', this)">
+                        group.innerHTML = `
+                            <div class="sub-header" onclick="toggleSub(this)">
                                 <span>${sub.name}</span>
                                 <span class="sub-arrow">▼</span>
                             </div>
                             <div class="item-list" id="list-${catKey}-${subKey}"></div>
                         `;
                     }
+                    subCont.appendChild(group);
 
-                    subCont.appendChild(subDiv);
-
-                    const listEl = subDiv.querySelector(`#list-${catKey}-${subKey}`);
-                    sub.items.forEach(item => {
-                        listEl.appendChild(createItemRow(item));
-                    });
+                    const listEl = group.querySelector(`#list-${catKey}-${subKey}`);
+                    sub.items.forEach(item => listEl.appendChild(createItemRow(item)));
                 });
             }
         });
     }
 
-    function toggleCat(key, header) {
-        const content = document.getElementById(`cat-${key}`);
-        content.classList.toggle('visible');
+    function toggleCat(header) {
         header.classList.toggle('expanded');
+        header.nextElementSibling.classList.toggle('visible');
     }
 
-    function toggleSub(catKey, subKey, header) {
-        const list = document.getElementById(`list-${catKey}-${subKey}`);
-        list.classList.toggle('visible');
+    function toggleSub(header) {
         header.classList.toggle('expanded');
+        header.nextElementSibling.classList.toggle('visible');
     }
-
-    window.toggleSub = toggleSub;
 
     function createItemRow(i) {
         const div = document.createElement('div');
@@ -618,141 +647,105 @@
         const q = cart[i.id] || 0;
         const hasCom = comments[i.id];
 
-        const btnHtml = q > 0 
-            ? `<div class="counter-wrap" onclick="openInput('${i.id}')">
-                 <span class="counter-val">${q}</span>
-                 <span class="counter-unit">${i.unit}</span>
-               </div>`
-            : `<button class="btn-add" onclick="addItem('${i.id}')">Добавить</button>`;
+        let controls = '';
 
-        const comHtml = q > 0 
-            ? `<button class="btn-comment ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>` 
-            : '';
+        if (q === 0) {
+            controls = `<button class="btn-add" onclick="addItem('${i.id}')">Добавить</button>`;
+        } else {
+            controls = `
+                <div class="counter-pill">
+                    <button class="btn-comment ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>
+                    <button class="btn-mini btn-minus" onclick="changeQty('${i.id}', -1)">−</button>
+                    <div class="val-display" onclick="openInput('${i.id}')">${q}</div>
+                    <button class="btn-mini btn-plus" onclick="changeQty('${i.id}', 1)">+</button>
+                </div>
+            `;
+        }
 
         return `
             <div class="item-info">
                 <div class="item-name">${i.name}</div>
-                <div class="item-unit">за ${i.unit}</div>
             </div>
-            <div style="display:flex; align-items:center;">
-                ${comHtml}
-                ${btnHtml}
-            </div>
+            <div>${controls}</div>
         `;
     }
 
-    // === ACTIONS ===
-    window.addItem = (id) => { cart[id] = 1; refreshItem(id); }
+    // ACTIONS
+    window.addItem = (id) => { cart[id] = 1; refreshItem(id); triggerTap(); }
+    window.changeQty = (id, delta) => {
+        const curr = cart[id] || 0;
+        const next = curr + delta;
+        if(next <= 0) { delete cart[id]; delete comments[id]; } 
+        else cart[id] = next;
+        refreshItem(id); triggerTap();
+    }
 
     function refreshItem(id) {
         const item = allItems.find(x => x.id == id);
-
         const row = document.getElementById(`row-${id}`);
         if(row) row.innerHTML = renderItemContent(item);
+        const sRow = document.getElementById(`search-row-${id}`);
+        if(sRow) sRow.innerHTML = renderItemContent(item);
+        updateCartBar();
+    }
 
-        const searchRow = document.getElementById(`search-row-${id}`);
-        if(searchRow) searchRow.innerHTML = renderItemContent(item);
+    function updateCartBar() {
+        const count = Object.keys(cart).length;
+        const bar = document.getElementById('cartBar');
+        document.getElementById('cartCount').innerText = `${count} позиций`;
 
-        updateCartBadge();
+        if(count > 0) bar.classList.add('visible'); 
+        else bar.classList.remove('visible');
     }
 
     window.openInput = (id) => {
         curItem = id;
         const i = allItems.find(x => x.id == id);
-        document.getElementById('inputName').innerText = i.name;
-        document.getElementById('inputUnit').innerText = i.unit;
+        document.getElementById('inputName').innerText = `${i.name} (${i.u})`;
         document.getElementById('sysInput').value = cart[id];
         openModal('inputModal');
-        setTimeout(() => document.getElementById('sysInput').focus(), 100);
+        setTimeout(()=>document.getElementById('sysInput').focus(),100);
     }
 
     window.saveInput = () => {
         const val = parseFloat(document.getElementById('sysInput').value);
         if(val > 0) cart[curItem] = val;
         else { delete cart[curItem]; delete comments[curItem]; }
-        refreshItem(curItem);
-        closeModal('inputModal');
+        refreshItem(curItem); closeModal('inputModal');
     }
 
     window.openComment = (id) => {
         curItem = id;
-        document.getElementById('comName').innerText = allItems.find(x => x.id == id).name;
         document.getElementById('comText').value = comments[id] || '';
         openModal('commentModal');
+        setTimeout(()=>document.getElementById('comText').focus(),100);
     }
 
     window.saveComment = () => {
         const val = document.getElementById('comText').value.trim();
         if(val) comments[curItem] = val; else delete comments[curItem];
-        refreshItem(curItem);
-        closeModal('commentModal');
+        refreshItem(curItem); closeModal('commentModal');
     }
 
-    function updateCartBadge() {
-        const cnt = Object.keys(cart).length;
-        const btn = document.getElementById('cartBtn');
-        const badge = document.getElementById('cartBadge');
-
-        if(cnt > 0) {
-            btn.classList.remove('hidden');
-            badge.innerText = cnt;
-        } else {
-            btn.classList.add('hidden');
-        }
-    }
-
-    // === SEARCH ===
-    function setupSearch() {
-        const inp = document.getElementById('search');
-        const resDiv = document.getElementById('searchResults');
-        const accDiv = document.getElementById('accordionView');
-
-        inp.addEventListener('input', (e) => {
-            const val = e.target.value.trim();
-
-            if(val.length < 2) {
-                resDiv.classList.remove('visible');
-                accDiv.classList.remove('hidden');
-                return;
-            }
-
-            accDiv.classList.add('hidden');
-            resDiv.classList.add('visible');
-
-            const results = fuse.search(val);
-            resDiv.innerHTML = '';
-
-            if(results.length === 0) {
-                resDiv.innerHTML = '<div style="text-align:center; color:#8e8e93; padding:20px;">Ничего не найдено</div>';
-                return;
-            }
-
-            results.forEach(r => {
-                const div = document.createElement('div');
-                div.className = 'item-row';
-                div.id = `search-row-${r.item.id}`;
-                div.innerHTML = renderItemContent(r.item);
-                resDiv.appendChild(div);
-            });
-        });
-    }
-
-    // === ORDER ===
+    // ORDER
     window.openOrderModal = () => {
         const list = document.getElementById('orderList');
         list.innerHTML = '';
-
         allItems.forEach(i => {
             if(cart[i.id]) {
-                const com = comments[i.id] ? `<div style="font-size:13px; color:#8e8e93; font-style:italic;">💬 ${comments[i.id]}</div>` : '';
                 const row = document.createElement('div');
-                row.className = 'order-row';
+                row.style.padding = '12px 0';
+                row.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                row.style.display = 'flex'; row.style.justifyContent='space-between';
+
+                let comHtml = comments[i.id] ? `<div style="color:#0a84ff; font-size:13px; margin-top:4px;">💬 ${comments[i.id]}</div>` : '';
+
                 row.innerHTML = `
-                    <div style="flex:1;">
-                        <div class="order-name">${i.name}</div>
-                        ${com}
+                    <div>
+                        <div style="font-size:16px; font-weight:600;">${i.name}</div>
+                        ${comHtml}
                     </div>
-                    <div class="order-qty">${cart[i.id]} ${i.unit}</div>
+                    <div style="font-size:18px; font-weight:700;">${cart[i.id]} <span style="font-size:12px; font-weight:400; color:#888;">${i.u}</span></div>
                 `;
                 list.appendChild(row);
             }
@@ -761,15 +754,38 @@
     }
 
     window.sendOrder = () => {
-        const data = {
-            cart: cart,
-            comments: comments,
-            global_comment: document.getElementById('globalCom').value
-        };
+        const data = { cart, comments, global: document.getElementById('globalCom').value };
         tg.sendData(JSON.stringify(data));
     }
 
-    // UTILS
+    // SEARCH
+    function setupSearch() {
+        const inp = document.getElementById('search');
+        const resDiv = document.getElementById('searchResults');
+        const accDiv = document.getElementById('accordionView');
+
+        inp.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if(val.length < 2) {
+                resDiv.classList.add('hidden'); accDiv.classList.remove('hidden'); return;
+            }
+            accDiv.classList.add('hidden'); resDiv.classList.remove('hidden');
+
+            const res = fuse.search(val);
+            resDiv.innerHTML = '';
+            if(res.length===0) { resDiv.innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Ничего не найдено</div>'; return; }
+
+            res.forEach(r => {
+                const d = document.createElement('div');
+                d.className = 'cat-card'; // Reuse styling
+                d.innerHTML = `<div class="item-row" id="search-row-${r.item.id}">${renderItemContent(r.item)}</div>`;
+                resDiv.appendChild(d);
+            });
+        });
+    }
+
+    // ANIMATIONS
+    function triggerTap() { document.body.style.animation = 'none'; document.body.offsetHeight; document.body.style.animation = 'tap 0.2s'; }
     window.openModal = (id) => document.getElementById(id).classList.add('visible');
     window.closeModal = (id) => document.getElementById(id).classList.remove('visible');
 
