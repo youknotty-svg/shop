@@ -18,7 +18,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
@@ -43,7 +43,7 @@
             background: #2c2c2e; color: #fff; font-size: 16px;
         }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
-        
+
         /* CART BUTTON (Floating) */
         .cart-float {
             position: fixed; bottom: 20px; right: 20px;
@@ -79,28 +79,37 @@
         .cat-icon { font-size: 24px; margin-right: 12px; }
         .arrow { transition: transform 0.3s; color: var(--text-sec); font-size: 14px; }
         .cat-row.expanded .arrow { transform: rotate(180deg); }
-        
+
         /* Subcategory Container (Level 2) */
         .sub-container { display: none; background: var(--bg); }
         .sub-container.visible { display: block; animation: fadeIn 0.3s; }
 
-        /* Subcategory Header */
+        /* Subcategory Header (Clickable) */
         .sub-header {
             padding: 12px 16px 12px 24px;
-            color: var(--text-sec);
+            color: var(--text);
             font-size: 15px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            background: #121212;
+            background: #1a1a1a;
             border-bottom: 1px solid #222;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer;
         }
+        .sub-header:active { background: #222; }
+        .sub-arrow { transition: transform 0.3s; color: var(--text-sec); font-size: 12px; }
+        .sub-header.expanded .sub-arrow { transform: rotate(180deg); }
 
         /* Item List */
-        .item-list { padding: 0; }
-        
+        .item-list { 
+            padding: 0; 
+            display: none;
+            background: #000;
+        }
+        .item-list.visible { display: block; animation: fadeIn 0.2s; }
+
         /* Product Item */
         .item-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 16px 12px 24px;
+            padding: 12px 16px 12px 32px;
             border-bottom: 1px solid var(--border);
             background: #000;
         }
@@ -114,7 +123,7 @@
             border: none; padding: 6px 14px; border-radius: 14px;
             font-weight: 600; font-size: 14px; cursor: pointer;
         }
-        
+
         .counter-wrap {
             display: flex; align-items: center; gap: 8px;
             background: rgba(10, 132, 255, 0.1);
@@ -156,7 +165,7 @@
             color: #fff; font-size: 32px; font-weight: 700;
             text-align: center; outline: none;
         }
-        
+
         .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
         .btn-full {
             flex: 1; padding: 14px; border-radius: 12px; border: none;
@@ -518,7 +527,6 @@
     let allItems = [], fuse, curItem = null;
 
     function init() {
-        // Подготовка данных
         Object.keys(DB).forEach(k => {
             const cat = DB[k];
             if(cat.subs) {
@@ -528,7 +536,7 @@
             }
         });
         fuse = new Fuse(allItems, { keys:['name'], threshold:0.3 });
-        
+
         renderAccordion();
         setupSearch();
     }
@@ -537,11 +545,10 @@
     function renderAccordion() {
         const c = document.getElementById('accordionView');
         c.innerHTML = '';
-        
+
         Object.keys(DB).forEach(catKey => {
             const cat = DB[catKey];
-            
-            // Main Category
+
             const catDiv = document.createElement('div');
             catDiv.innerHTML = `
                 <div class="cat-row" onclick="toggleCat('${catKey}', this)">
@@ -552,24 +559,30 @@
             `;
             c.appendChild(catDiv);
 
-            // Subcategories
             const subCont = catDiv.querySelector(`#cat-${catKey}`);
             if(cat.subs) {
                 Object.keys(cat.subs).forEach(subKey => {
                     const sub = cat.subs[subKey];
                     const isSingle = Object.keys(cat.subs).length === 1 && subKey === 'all';
-                    
+
                     const subDiv = document.createElement('div');
-                    // Если подкатегория всего одна "все", заголовок не нужен
-                    const headerHTML = isSingle ? '' : `<div class="sub-header">${sub.name}</div>`;
-                    
-                    subDiv.innerHTML = `
-                        ${headerHTML}
-                        <div class="item-list" id="list-${catKey}-${subKey}"></div>
-                    `;
+
+                    if(isSingle) {
+                        // Если только одна подкатегория "Все", показать товары сразу
+                        subDiv.innerHTML = `<div class="item-list visible" id="list-${catKey}-${subKey}"></div>`;
+                    } else {
+                        // Если несколько подкатегорий - делаем выпадающими
+                        subDiv.innerHTML = `
+                            <div class="sub-header" onclick="toggleSub('${catKey}', '${subKey}', this)">
+                                <span>${sub.name}</span>
+                                <span class="sub-arrow">▼</span>
+                            </div>
+                            <div class="item-list" id="list-${catKey}-${subKey}"></div>
+                        `;
+                    }
+
                     subCont.appendChild(subDiv);
-                    
-                    // Render Items directly to avoid massive recalculations on open
+
                     const listEl = subDiv.querySelector(`#list-${catKey}-${subKey}`);
                     sub.items.forEach(item => {
                         listEl.appendChild(createItemRow(item));
@@ -581,12 +594,17 @@
 
     function toggleCat(key, header) {
         const content = document.getElementById(`cat-${key}`);
-        const isHidden = !content.classList.contains('visible');
-        
-        // Close others? No, allow multiple open for comparison
         content.classList.toggle('visible');
         header.classList.toggle('expanded');
     }
+
+    function toggleSub(catKey, subKey, header) {
+        const list = document.getElementById(`list-${catKey}-${subKey}`);
+        list.classList.toggle('visible');
+        header.classList.toggle('expanded');
+    }
+
+    window.toggleSub = toggleSub;
 
     function createItemRow(i) {
         const div = document.createElement('div');
@@ -599,14 +617,14 @@
     function renderItemContent(i) {
         const q = cart[i.id] || 0;
         const hasCom = comments[i.id];
-        
+
         const btnHtml = q > 0 
             ? `<div class="counter-wrap" onclick="openInput('${i.id}')">
                  <span class="counter-val">${q}</span>
                  <span class="counter-unit">${i.unit}</span>
                </div>`
             : `<button class="btn-add" onclick="addItem('${i.id}')">Добавить</button>`;
-            
+
         const comHtml = q > 0 
             ? `<button class="btn-comment ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>` 
             : '';
@@ -625,18 +643,16 @@
 
     // === ACTIONS ===
     window.addItem = (id) => { cart[id] = 1; refreshItem(id); }
-    
+
     function refreshItem(id) {
         const item = allItems.find(x => x.id == id);
-        
-        // Update in Accordion
+
         const row = document.getElementById(`row-${id}`);
         if(row) row.innerHTML = renderItemContent(item);
-        
-        // Update in Search if visible
+
         const searchRow = document.getElementById(`search-row-${id}`);
         if(searchRow) searchRow.innerHTML = renderItemContent(item);
-        
+
         updateCartBadge();
     }
 
@@ -676,7 +692,7 @@
         const cnt = Object.keys(cart).length;
         const btn = document.getElementById('cartBtn');
         const badge = document.getElementById('cartBadge');
-        
+
         if(cnt > 0) {
             btn.classList.remove('hidden');
             badge.innerText = cnt;
@@ -690,27 +706,27 @@
         const inp = document.getElementById('search');
         const resDiv = document.getElementById('searchResults');
         const accDiv = document.getElementById('accordionView');
-        
+
         inp.addEventListener('input', (e) => {
             const val = e.target.value.trim();
-            
+
             if(val.length < 2) {
                 resDiv.classList.remove('visible');
                 accDiv.classList.remove('hidden');
                 return;
             }
-            
+
             accDiv.classList.add('hidden');
             resDiv.classList.add('visible');
-            
+
             const results = fuse.search(val);
             resDiv.innerHTML = '';
-            
+
             if(results.length === 0) {
                 resDiv.innerHTML = '<div style="text-align:center; color:#8e8e93; padding:20px;">Ничего не найдено</div>';
                 return;
             }
-            
+
             results.forEach(r => {
                 const div = document.createElement('div');
                 div.className = 'item-row';
@@ -725,7 +741,7 @@
     window.openOrderModal = () => {
         const list = document.getElementById('orderList');
         list.innerHTML = '';
-        
+
         allItems.forEach(i => {
             if(cart[i.id]) {
                 const com = comments[i.id] ? `<div style="font-size:13px; color:#8e8e93; font-style:italic;">💬 ${comments[i.id]}</div>` : '';
