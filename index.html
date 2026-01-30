@@ -10,27 +10,32 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <style>
         :root {
-            /* Цвета берем из темы Телеграма */
-            --tg-bg: var(--tg-theme-bg-color, #fff);
-            --tg-text: var(--tg-theme-text-color, #000);
-            --tg-hint: var(--tg-theme-hint-color, #999);
-            --tg-link: var(--tg-theme-link-color, #2481cc);
-            --tg-button: var(--tg-theme-button-color, #2481cc); /* Синий */
-            --tg-button-text: var(--tg-theme-button-text-color, #fff);
-            --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f0f2f5);
+            /* DARK THEME PALETTE */
+            --bg-color: #0f0f0f;         /* Почти черный фон */
+            --card-bg: #1c1c1e;          /* Темно-серые карточки */
+            --secondary-bg: #000000;     /* Черный для хедера/табов */
             
-            --card-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --text-primary: #ffffff;     /* Белый текст */
+            --text-secondary: #8e8e93;   /* Серый текст */
+            
+            --accent-color: #2481cc;     /* Telegram Blue */
+            --accent-text: #ffffff;
+            
+            --danger: #ff3b30;
+            --success: #30d158;
+            
             --radius: 14px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--tg-secondary-bg);
-            color: var(--tg-text);
-            padding-bottom: 100px; /* Место под кнопку */
-            overflow-y: scroll; /* Для плавности */
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding-bottom: 100px;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* === HEADER === */
@@ -38,41 +43,39 @@
             position: sticky;
             top: 0;
             z-index: 999;
-            background: var(--tg-bg);
+            background: rgba(28, 28, 30, 0.85); /* Полупрозрачный хедер */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 12px 16px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .search-container {
-            position: relative;
-        }
+        .search-container { position: relative; }
 
         .search-input {
             width: 100%;
             padding: 12px 40px 12px 16px;
             border-radius: 12px;
-            border: 1px solid transparent;
-            background: var(--tg-secondary-bg);
-            color: var(--tg-text);
+            border: none;
+            background: rgba(118, 118, 128, 0.24); /* Темный инпут */
+            color: var(--text-primary);
             font-size: 16px;
             outline: none;
+            box-sizing: border-box;
             transition: 0.2s;
-            box-sizing: border-box; /* Важно! */
         }
         
-        .search-input:focus {
-            background: var(--tg-bg);
-            border-color: var(--tg-button);
-            box-shadow: 0 0 0 2px rgba(36, 129, 204, 0.2);
-        }
+        .search-input::placeholder { color: #8e8e93; }
+        .search-input:focus { background: rgba(118, 118, 128, 0.35); }
 
         .search-icon {
             position: absolute;
             right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            opacity: 0.5;
+            opacity: 0.7;
             pointer-events: none;
+            filter: grayscale(1);
         }
 
         /* === TABS === */
@@ -80,45 +83,46 @@
             display: flex;
             gap: 12px;
             overflow-x: auto;
-            padding: 12px 16px;
-            background: var(--tg-bg);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 16px;
             scrollbar-width: none;
         }
         .tabs::-webkit-scrollbar { display: none; }
 
         .tab {
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: 20px;
-            background: var(--tg-secondary-bg);
-            color: var(--tg-text);
+            background: #2c2c2e;
+            color: var(--text-primary);
             font-weight: 500;
             white-space: nowrap;
             cursor: pointer;
             transition: 0.2s;
-            border: 1px solid transparent;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .tab.active {
-            background: var(--tg-button);
-            color: var(--tg-button-text);
+            background: var(--accent-color);
+            color: var(--accent-text);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(36, 129, 204, 0.4);
         }
 
         /* === GRID === */
         .grid {
             display: grid;
-            grid-template-columns: 1fr; /* Одна колонка на мобиле лучше читается */
-            gap: 16px; /* Увеличили отступы */
-            padding: 16px;
+            grid-template-columns: 1fr; 
+            gap: 16px; /* Большие отступы */
+            padding: 0 16px 16px 16px;
         }
 
         .card {
-            background: var(--tg-bg);
+            background: var(--card-bg);
             border-radius: var(--radius);
             padding: 16px;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
         .card-header {
@@ -127,46 +131,44 @@
             align-items: flex-start;
         }
 
-        .card-info { flex: 1; margin-right: 10px; }
-        .card-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
-        .card-price { color: var(--tg-button); font-weight: 700; font-size: 16px; }
-        .card-unit { color: var(--tg-hint); font-size: 14px; font-weight: 400; }
+        .card-info { flex: 1; margin-right: 12px; }
+        .card-name { font-size: 17px; font-weight: 600; margin-bottom: 6px; line-height: 1.3; }
+        .card-price { color: var(--accent-color); font-weight: 700; font-size: 16px; }
+        .card-unit { color: var(--text-secondary); font-size: 14px; font-weight: 400; margin-left: 4px;}
 
         /* Кнопки */
         .btn-add {
-            padding: 8px 20px;
+            padding: 10px 24px;
             border-radius: 20px;
-            background: rgba(36, 129, 204, 0.1); /* Легкий синий */
-            color: var(--tg-button);
+            background: rgba(36, 129, 204, 0.15); /* Темно-синий фон кнопки */
+            color: #5ac8fa; /* Светло-синий текст для контраста на темном */
             border: none;
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
-            transition: 0.2s;
         }
-        .btn-add:active { transform: scale(0.95); }
+        .btn-add:active { opacity: 0.7; }
 
         .counter {
             display: flex;
             align-items: center;
-            background: var(--tg-button);
+            background: #2c2c2e;
             border-radius: 20px;
             padding: 4px;
-            color: var(--tg-button-text);
+            border: 1px solid var(--accent-color);
         }
         .counter button {
             background: transparent;
             border: none;
-            color: #fff;
+            color: var(--accent-color);
             width: 32px;
             height: 28px;
-            font-size: 18px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
         }
-        .count-val { min-width: 24px; text-align: center; font-weight: 600; font-size: 15px; }
+        .count-val { min-width: 24px; text-align: center; font-weight: 700; font-size: 15px; color: var(--text-primary); }
 
         /* Комментарий к товару */
         .comment-field {
@@ -178,89 +180,86 @@
         
         .item-comment-input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: var(--tg-secondary-bg);
-            color: var(--tg-text);
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+            color: var(--text-primary);
             font-size: 14px;
             box-sizing: border-box;
             outline: none;
         }
+        .item-comment-input:focus { border-color: var(--accent-color); }
 
         /* === MODAL CONFIRM === */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             z-index: 2000;
             display: none;
-            backdrop-filter: blur(4px);
-            align-items: flex-end; /* Шторка снизу */
+            backdrop-filter: blur(5px);
+            align-items: flex-end;
         }
         .modal-overlay.visible { display: flex; }
 
         .modal-content {
-            background: var(--tg-bg);
+            background: #1c1c1e;
             width: 100%;
             border-radius: 20px 20px 0 0;
-            padding: 20px;
+            padding: 24px;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 -4px 30px rgba(0,0,0,0.5);
             animation: slideUp 0.3s;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 16px; }
+        .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; color: #fff; }
         
-        .summary-list { margin-bottom: 20px; }
+        .summary-list { margin-bottom: 24px; }
         .summary-item {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .summary-name { font-weight: 500; font-size: 15px; }
-        .summary-note { font-size: 13px; color: var(--tg-hint); margin-top: 2px; }
+        .summary-name { font-weight: 500; font-size: 16px; color: #fff; }
+        .summary-note { font-size: 13px; color: #8e8e93; margin-top: 4px; font-style: italic; }
 
         .global-comment-area {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: var(--tg-secondary-bg);
-            color: var(--tg-text);
-            font-size: 15px;
-            min-height: 80px;
-            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            font-size: 16px;
+            min-height: 100px;
+            margin-bottom: 24px;
             box-sizing: border-box;
             font-family: inherit;
         }
 
-        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons { display: flex; gap: 12px; }
         .btn-modal {
             flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 600;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 700;
             text-align: center;
             cursor: pointer;
             border: none;
             font-size: 16px;
         }
-        .btn-confirm { background: var(--tg-button); color: var(--tg-button-text); }
-        .btn-cancel { background: var(--tg-secondary-bg); color: var(--tg-text); }
+        .btn-confirm { background: var(--accent-color); color: #fff; box-shadow: 0 4px 15px rgba(36, 129, 204, 0.4); }
+        .btn-cancel { background: #3a3a3c; color: #fff; }
 
         @keyframes slideDown { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1;} }
         @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
-        .empty-state {
-            text-align: center;
-            color: var(--tg-hint);
-            padding: 40px 20px;
-            font-size: 16px;
-        }
+        .empty-state { text-align: center; color: var(--text-secondary); padding: 60px 20px; font-size: 17px; }
     </style>
 </head>
 <body>
@@ -285,8 +284,8 @@
             <div class="modal-title">Ваш заказ</div>
             <div id="modalSummary" class="summary-list"></div>
             
-            <div style="font-weight:600; margin-bottom:8px;">Комментарий ко всему заказу:</div>
-            <textarea class="global-comment-area" id="globalComment" placeholder="Позвоните мне, нужен чек..."></textarea>
+            <div style="font-weight:600; margin-bottom:10px; color:#fff;">Комментарий к заказу:</div>
+            <textarea class="global-comment-area" id="globalComment" placeholder="Например: Позвоните за час..."></textarea>
             
             <div class="modal-buttons">
                 <button class="btn-modal btn-cancel" onclick="closeModal()">Назад</button>
@@ -298,7 +297,9 @@
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    
+    tg.setHeaderColor('#1c1c1e'); // Красим шапку самого телеграма
+    tg.setBackgroundColor('#0f0f0f');
+
     // === ДАННЫЕ ===
     const DB = [
   {
@@ -453,13 +454,13 @@
   }
 ];
 
-    // Подготовка Fuse.js (Умный поиск)
+    // Умный поиск (Fuse.js)
     let allItems = [];
     DB.forEach(cat => allItems = allItems.concat(cat.items));
     
     const fuse = new Fuse(allItems, {
         keys: ['name'],
-        threshold: 0.4, // Насколько сильно можно ошибаться (0.4 - оптимально)
+        threshold: 0.4,
         distance: 100
     });
 
@@ -472,15 +473,12 @@
         renderTabs();
         renderItems(DB[0].items);
         
-        // Поиск
         document.getElementById('search').addEventListener('input', (e) => {
             const val = e.target.value.trim();
             if (val.length === 0) {
-                // Восстанавливаем категорию
                 let cat = DB.find(c => c.id === activeCat);
                 if (cat) renderItems(cat.items);
             } else {
-                // Fuse поиск
                 const results = fuse.search(val).map(res => res.item);
                 renderItems(results);
             }
@@ -488,11 +486,12 @@
 
         tg.MainButton.setParams({
             text: 'ОФОРМИТЬ ЗАКАЗ',
-            color: '#2481cc' // Синий
+            color: '#2481cc',
+            text_color: '#ffffff'
         });
         
         tg.MainButton.onClick(() => {
-            openModal(); // Теперь открываем модалку, а не отправляем сразу
+            openModal();
         });
     }
 
@@ -504,9 +503,7 @@
             el.className = `tab ${idx===0?'active':''}`;
             el.innerText = cat.name;
             el.onclick = () => {
-                // Сброс поиска
                 document.getElementById('search').value = '';
-                // Переключение
                 document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
                 el.classList.add('active');
                 activeCat = cat.id;
@@ -521,7 +518,7 @@
         c.innerHTML = '';
         
         if(items.length === 0) {
-            c.innerHTML = '<div class="empty-state">Ничего не найдено 🤷‍♂️</div>';
+            c.innerHTML = '<div class="empty-state">Ничего не найдено 🔭</div>';
             return;
         }
 
@@ -531,23 +528,25 @@
             
             let qty = cart[prod.id] || 0;
             let comment = comments[prod.id] || "";
-            let priceText = prod.price > 0 ? `${prod.price} ₽` : 'Цена по факту';
+            let priceText = prod.price > 0 ? `${prod.price} ₽` : 'По факту';
 
             el.innerHTML = `
                 <div class="card-header">
                     <div class="card-info">
                         <div class="card-name">${prod.name}</div>
-                        <div class="card-unit">${prod.unit}</div>
-                        <div class="card-price">${priceText}</div>
+                        <div>
+                            <span class="card-price">${priceText}</span> 
+                            <span class="card-unit">/ ${prod.unit}</span>
+                        </div>
                     </div>
                     <div id="btn-${prod.id}">
-                        ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">Добавить</button>`}
+                        ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">В корзину</button>`}
                     </div>
                 </div>
                 
                 <div class="comment-field ${qty>0 ? 'visible' : ''}" id="com-${prod.id}">
                     <input type="text" class="item-comment-input" 
-                           placeholder="✏️ Комментарий к товару..." 
+                           placeholder="✏️ Комментарий..." 
                            value="${comment}"
                            oninput="saveComment('${prod.id}', this.value)">
                 </div>
@@ -587,7 +586,6 @@
     }
 
     function updateUI(id) {
-        // Обновляем кнопку в списке
         let btn = document.getElementById(`btn-${id}`);
         let comField = document.getElementById(`com-${id}`);
         
@@ -597,11 +595,10 @@
                 btn.innerHTML = getCounterHtml(id, qty);
                 if(comField) comField.classList.add('visible');
             } else {
-                btn.innerHTML = `<button class="btn-add" onclick="add('${id}')">Добавить</button>`;
+                btn.innerHTML = `<button class="btn-add" onclick="add('${id}')">В корзину</button>`;
                 if(comField) comField.classList.remove('visible');
             }
         }
-        
         calcTotal();
     }
 
@@ -623,7 +620,7 @@
         }
     }
 
-    // === MODAL LOGIC ===
+    // === MODAL ===
     window.openModal = function() {
         const list = document.getElementById('modalSummary');
         list.innerHTML = '';
@@ -642,7 +639,7 @@
                         <div class="summary-name">${p.name}</div>
                         ${commHtml}
                     </div>
-                    <div style="font-weight:600; white-space:nowrap; margin-left:10px;">
+                    <div style="font-weight:600; white-space:nowrap; margin-left:10px; color:#fff;">
                         ${cart[p.id]} ${p.unit}
                     </div>
                 `;
@@ -650,7 +647,7 @@
             }
         });
 
-        if(!hasItems) return; // Не должно случаться
+        if(!hasItems) return;
         document.getElementById('confirmModal').classList.add('visible');
     }
 
