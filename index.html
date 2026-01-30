@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Магазин</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #fff);
+            --text-color: var(--tg-theme-text-color, #000);
+            --hint-color: var(--tg-theme-hint-color, #999);
+            --link-color: var(--tg-theme-link-color, #2481cc);
+            --button-color: var(--tg-theme-button-color, #2481cc);
+            --button-text: var(--tg-theme-button-text-color, #fff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            padding-bottom: 80px; /* Место для скролла */
+        }
+
+        /* Навигация (Табы) */
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background: var(--bg-color);
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .tab {
+            padding: 8px 16px;
+            margin-right: 10px;
+            border-radius: 20px;
+            background: var(--secondary-bg);
+            color: var(--text-color);
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .tab.active {
+            background: var(--button-color);
+            color: var(--button-text);
+        }
+
+        /* Секции */
+        .section-title {
+            padding: 15px 15px 5px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--hint-color);
+            text-transform: uppercase;
+        }
+
+        /* Сетка товаров */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 колонки */
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .card {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .card-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .card-price {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .card-unit {
+            font-size: 12px;
+            color: var(--hint-color);
+            font-weight: normal;
+        }
+
+        /* Кнопки управления */
+        .btn-add {
+            width: 100%;
+            padding: 8px;
+            background: var(--secondary-bg);
+            color: var(--button-color);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .counter {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--button-color);
+            border-radius: 8px;
+            padding: 4px;
+            color: var(--button-text);
+        }
+        .counter button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            width: 30px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .count-val {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="tabs" id="tabs">
+        <!-- Табы генерятся JS -->
+    </div>
+
+    <div id="content">
+        <!-- Товары генерятся JS -->
+    </div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // На весь экран
+
+    // === БАЗА ДАННЫХ (Взята из твоего списка) ===
+    const DATABASE = [
+        {
+            id: "veg", name: "🥦 Овощи", items: [
+                {id: "v_tom_kr", name: "🍅 Томат Краснодар", price: 410, unit: "кг"},
+                {id: "v_tom_uz", name: "🍅 Томат Узбекистан", price: 780, unit: "кг"},
+                {id: "v_tom_ch", name: "🍅 Томат Черри кр.", price: 840, unit: "кг"},
+                {id: "v_pot", name: "🥔 Картофель мытый", price: 63, unit: "кг"},
+                {id: "v_cuc", name: "🥒 Огурцы Баку", price: 520, unit: "кг"},
+                {id: "v_cab", name: "🥬 Капуста мол.", price: 126, unit: "кг"},
+                {id: "v_pep", name: "🌶 Перец Болгарский", price: 265, unit: "кг"},
+                {id: "v_car", name: "🥕 Морковь мытая", price: 65, unit: "кг"},
+                {id: "v_oni", name: "🧅 Лук репчатый", price: 44, unit: "кг"},
+                {id: "v_gar", name: "🧄 Чеснок", price: 266, unit: "кг"},
+                {id: "v_zub", name: "🍆 Баклажан", price: 175, unit: "кг"},
+                {id: "v_kab", name: "🥒 Кабачок", price: 475, unit: "кг"},
+                {id: "v_rad", name: "🔴 Редис", price: 210, unit: "кг"},
+                {id: "v_avoc", name: "🥑 Авокадо Хасс", price: 630, unit: "кг"}
+            ]
+        },
+        {
+            id: "grn", name: "🌿 Зелень", items: [
+                {id: "g_dill", name: "Укроп", price: 290, unit: "кг"},
+                {id: "g_petr", name: "Петрушка", price: 280, unit: "кг"},
+                {id: "g_kinz", name: "Кинза", price: 630, unit: "кг"},
+                {id: "g_onion", name: "Лук зеленый", price: 700, unit: "кг"},
+                {id: "g_spin", name: "Шпинат", price: 770, unit: "кг"},
+                {id: "g_sal_rom", name: "Салат Романо", price: 215, unit: "кг"},
+                {id: "g_sal_ice", name: "Салат Айсберг", price: 265, unit: "кг"},
+                {id: "g_ruk", name: "Руккола", price: 1650, unit: "кг"},
+                {id: "g_baz", name: "Базилик", price: 2240, unit: "кг"},
+                {id: "g_mint", name: "Мята", price: 1250, unit: "кг"}
+            ]
+        },
+        {
+            id: "fru", name: "🍎 Фрукты", items: [
+                {id: "f_app", name: "Яблоки Голден", price: 210, unit: "кг"},
+                {id: "f_pea", name: "Груша Конференц", price: 395, unit: "кг"},
+                {id: "f_ban", name: "Банан", price: 175, unit: "кг"},
+                {id: "f_ora", name: "Апельсин", price: 145, unit: "кг"},
+                {id: "f_man", name: "Мандарин", price: 235, unit: "кг"},
+                {id: "f_lem", name: "Лимон", price: 345, unit: "кг"},
+                {id: "f_kiw", name: "Киви", price: 175, unit: "кг"},
+                {id: "f_mango", name: "Манго Египет", price: 755, unit: "кг"},
+                {id: "f_vin", name: "Виноград б/к", price: 560, unit: "кг"},
+                {id: "f_gran", name: "Гранат", price: 420, unit: "кг"}
+            ]
+        },
+        {
+            id: "ber", name: "🍓 Ягоды", items: [
+                {id: "b_str", name: "Клубника", price: 1450, unit: "кг"},
+                {id: "b_blu", name: "Голубика", price: 1850, unit: "кг"},
+                {id: "b_mal", name: "Малина", price: 3420, unit: "кг"},
+                {id: "b_eje", name: "Ежевика", price: 5600, unit: "кг"}
+            ]
+        },
+        {
+            id: "mus", name: "🍄 Грибы", items: [
+                {id: "m_sha", name: "Шампиньоны", price: 310, unit: "кг"},
+                {id: "m_ves", name: "Вешенки", price: 585, unit: "кг"}
+            ]
+        }
+    ];
+
+    let cart = {}; // {id: quantity}
+
+    // Инициализация
+    function init() {
+        renderTabs();
+        renderContent('veg'); // По умолчанию овощи
+        
+        tg.MainButton.setParams({
+            text: 'ЗАКАЗАТЬ',
+            color: '#2ea64e' // Зеленый цвет
+        });
+    }
+
+    // Рендер Табов
+    function renderTabs() {
+        const container = document.getElementById('tabs');
+        DATABASE.forEach((cat, index) => {
+            let btn = document.createElement('div');
+            btn.className = `tab ${index === 0 ? 'active' : ''}`;
+            btn.innerText = cat.name;
+            btn.onclick = () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                renderContent(cat.id);
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    // Рендер Товаров
+    function renderContent(catId) {
+        const container = document.getElementById('content');
+        container.innerHTML = ''; // Очистка
+        
+        // Находим категорию
+        const category = DATABASE.find(c => c.id === catId);
+        
+        // Заголовок
+        let title = document.createElement('div');
+        title.className = 'section-title';
+        title.innerText = category.name;
+        container.appendChild(title);
+
+        // Сетка
+        let grid = document.createElement('div');
+        grid.className = 'grid';
+
+        category.items.forEach(prod => {
+            let card = document.createElement('div');
+            card.className = 'card';
+            
+            // Проверяем корзину
+            let qty = cart[prod.id] || 0;
+            let priceHtml = prod.price > 0 ? `${prod.price}₽` : 'По запросу';
+
+            card.innerHTML = `
+                <div>
+                    <div class="card-name">${prod.name}</div>
+                    <div class="card-price">${priceHtml} <span class="card-unit">/ ${prod.unit}</span></div>
+                </div>
+                <div id="btn-${prod.id}">
+                    ${qty > 0 ? getCounterHtml(prod.id, qty) : `<button class="btn-add" onclick="add('${prod.id}')">Добавить</button>`}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    function getCounterHtml(id, qty) {
+        return `
+            <div class="counter">
+                <button onclick="change('${id}', -1)">−</button>
+                <div class="count-val">${qty}</div>
+                <button onclick="change('${id}', 1)">+</button>
+            </div>
+        `;
+    }
+
+    // Логика добавления
+    window.add = function(id) {
+        cart[id] = 1;
+        updateCard(id);
+        updateMainButton();
+    }
+
+    window.change = function(id, delta) {
+        if (!cart[id]) cart[id] = 0;
+        cart[id] += delta;
+        if (cart[id] <= 0) delete cart[id];
+        
+        updateCard(id);
+        updateMainButton();
+    }
+
+    function updateCard(id) {
+        let btnContainer = document.getElementById(`btn-${id}`);
+        if (btnContainer) {
+            let qty = cart[id] || 0;
+            if (qty > 0) {
+                btnContainer.innerHTML = getCounterHtml(id, qty);
+            } else {
+                btnContainer.innerHTML = `<button class="btn-add" onclick="add('${id}')">Добавить</button>`;
+            }
+        }
+    }
+
+    function updateMainButton() {
+        let totalSum = 0;
+        let count = 0;
+        
+        // Считаем сумму
+        for (let cat of DATABASE) {
+            for (let prod of cat.items) {
+                if (cart[prod.id]) {
+                    totalSum += prod.price * cart[prod.id];
+                    count += 1;
+                }
+            }
+        }
+
+        if (count > 0) {
+            tg.MainButton.setText(`ЗАКАЗАТЬ: ${totalSum}₽`);
+            tg.MainButton.show();
+        } else {
+            tg.MainButton.hide();
+        }
+    }
+
+    // Отправка данных боту
+    tg.MainButton.onClick(function() {
+        let dataToSend = {
+            cart: cart,
+            total: tg.MainButton.text // передаем текст кнопки с суммой
+        };
+        tg.sendData(JSON.stringify(dataToSend));
+    });
+
+    init();
+</script>
+</body>
+</html>
