@@ -15,10 +15,9 @@
             --text-sec: #8e8e93;
             --accent: #2481cc;
             --border: rgba(255,255,255,0.1);
-            --shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -28,7 +27,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* === HEADER === */
+        /* HEADER */
         .header {
             position: sticky;
             top: 0;
@@ -37,494 +36,223 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 12px 16px;
+            padding: 10px 16px;
         }
 
-        .header-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 12px;
-        }
+        .header-row { display: flex; gap: 10px; align-items: center; }
 
-        .search-wrapper {
-            flex: 1;
-            position: relative;
-        }
-
+        .search-wrapper { flex: 1; position: relative; }
         .search-input {
             width: 100%;
-            padding: 10px 40px 10px 36px;
+            padding: 8px 36px 8px 32px;
             border-radius: 10px;
             border: none;
             background: rgba(118, 118, 128, 0.24);
             color: var(--text);
             font-size: 16px;
         }
-        .search-input::placeholder { color: var(--text-sec); }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.7;
-        }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity: 0.7; font-size: 14px; }
 
         .cart-badge {
             position: relative;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             background: var(--card-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
         }
         .cart-count {
             position: absolute;
-            top: -4px;
-            right: -4px;
+            top: -5px; right: -5px;
             background: #ff3b30;
             color: #fff;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 10px;
-            min-width: 18px;
+            min-width: 16px;
             text-align: center;
         }
 
+        /* Autocomplete */
         .autocomplete {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+            position: absolute; top: 100%; left: 0; right: 0;
             background: var(--card-bg);
             border-radius: 0 0 10px 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-            box-shadow: var(--shadow);
-            z-index: 100;
+            max-height: 60vh; overflow-y: auto;
+            display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100;
         }
         .autocomplete.visible { display: block; }
         .autocomplete-item {
             padding: 12px 16px;
             border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
+            display: flex; justify-content: space-between;
         }
-        .autocomplete-item:hover { background: rgba(255,255,255,0.05); }
 
-        .breadcrumbs {
+        /* Nav & Back Button */
+        .nav-bar {
             display: flex;
-            gap: 8px;
             align-items: center;
-            font-size: 14px;
-            color: var(--text-sec);
-            padding: 8px 0;
+            padding: 8px 0 0 0;
+            min-height: 30px;
         }
-        .breadcrumb { cursor: pointer; }
-        .breadcrumb.active { color: var(--accent); font-weight: 600; }
-
-        .filters {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 8px 0;
-            scrollbar-width: none;
-        }
-        .filters::-webkit-scrollbar { display: none; }
-        .filter-btn {
-            padding: 6px 14px;
-            border-radius: 16px;
-            background: #2c2c2e;
-            color: var(--text);
-            border: 1px solid transparent;
-            font-size: 13px;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-        .filter-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        /* === MAIN === */
-        .container { padding: 0 16px; }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 20px 0 12px;
-        }
-
-        /* КОМПАКТНЫЕ КАТЕГОРИИ НА ГЛАВНОЙ */
-        .home-categories {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 12px 0;
-        }
-
-        .home-category-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px 12px;
-            display: flex;
-            flex-direction: column;
+        
+        .back-btn {
+            display: inline-flex;
             align-items: center;
-            text-align: center;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            position: relative;
-            transition: transform 0.2s;
-            min-height: 100px;
-        }
-        .home-category-card:active { 
-            transform: scale(0.95); 
-        }
-
-        .home-category-icon {
-            font-size: 36px;
-            margin-bottom: 8px;
-        }
-
-        .home-category-name {
+            gap: 6px;
+            color: var(--accent);
             font-size: 15px;
             font-weight: 600;
-            margin-bottom: 2px;
+            cursor: pointer;
+            padding: 4px 8px 4px 0;
         }
+        .breadcrumbs { font-size: 13px; color: var(--text-sec); margin-left: auto; }
 
-        .home-category-count {
-            font-size: 12px;
+        /* MAIN */
+        .container { padding: 0 12px; }
+
+        .section-title {
+            font-size: 18px; font-weight: 700;
+            margin: 16px 0 10px;
             color: var(--text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .home-category-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--accent);
-            color: #fff;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-weight: 700;
-        }
-
-        /* Subcategory Grid */
-        .category-grid {
+        /* Categories */
+        .home-categories, .category-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            padding-bottom: 20px;
         }
 
         .category-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 16px 12px;
+            padding: 12px;
             text-align: center;
-            cursor: pointer;
             border: 1px solid var(--border);
             position: relative;
             min-height: 90px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
         }
-        .category-card:active { opacity: 0.7; }
-        .category-icon { font-size: 32px; margin-bottom: 6px; }
-        .category-name { font-weight: 600; font-size: 14px; }
-        .category-counter {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--accent);
-            color: #fff;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-weight: 700;
+        .category-card:active { background: #2c2c2e; }
+        
+        .cat-icon { font-size: 32px; margin-bottom: 6px; }
+        .cat-name { font-size: 14px; font-weight: 600; line-height: 1.2; }
+        .cat-badge {
+            position: absolute; top: 6px; right: 6px;
+            background: var(--accent); color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 6px; font-weight: 700;
         }
 
-        /* Product Grid */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 24px;
-        }
+        /* Products */
+        .product-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
 
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
+            padding: 10px 12px;
+            display: flex; justify-content: space-between; align-items: center;
             border: 1px solid var(--border);
-            min-height: 100px;
+            min-height: 60px;
         }
 
-        .product-header {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            align-items: flex-start;
-        }
-        .product-info { flex: 1; }
-        .product-name { 
-            font-size: 14px; 
-            font-weight: 600; 
-            line-height: 1.3; 
-            margin-bottom: 6px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .product-meta { 
-            display: flex; 
-            align-items: baseline; 
-            gap: 4px; 
-            font-size: 13px;
-            margin-top: auto;
-        }
-        .product-price { color: var(--accent); font-weight: 700; font-size: 15px; }
-        .product-unit { color: var(--text-sec); font-size: 11px; }
+        .prod-info { flex: 1; padding-right: 10px; }
+        .prod-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
+        .prod-price { font-size: 14px; font-weight: 700; color: var(--accent); }
+        .prod-unit { font-size: 12px; color: var(--text-sec); font-weight: 400; }
 
-        .product-actions {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 4px;
-        }
+        .prod-actions { display: flex; align-items: center; gap: 8px; }
 
+        /* BUTTONS (Compact) */
         .btn-add {
-            padding: 6px 14px;
-            border-radius: 14px;
             background: rgba(36, 129, 204, 0.15);
             color: #5ac8fa;
             border: none;
-            font-weight: 600;
-            font-size: 13px;
-            white-space: nowrap;
-            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px; font-weight: 600;
         }
-
-        /* Счётчик - кликабельный */
+        
         .counter {
-            display: flex;
-            align-items: center;
             background: rgba(36, 129, 204, 0.15);
-            border-radius: 14px;
-            padding: 4px 8px;
+            border-radius: 8px;
+            padding: 6px 10px;
+            display: flex; align-items: center; gap: 4px;
             cursor: pointer;
-            gap: 4px;
+            min-width: 60px; justify-content: center;
         }
-        .counter:active { opacity: 0.7; }
-        
-        .counter-val { 
-            font-weight: 700; 
-            font-size: 13px;
-            color: var(--accent);
-            min-width: 20px;
-            text-align: center;
-        }
-        
-        .counter-unit {
-            font-size: 11px;
-            color: var(--text-sec);
-        }
+        .counter-val { font-size: 14px; font-weight: 700; color: #5ac8fa; }
+        .counter-unit { font-size: 11px; color: #8e8e93; }
 
-        .btn-comment {
-            background: rgba(118, 118, 128, 0.24);
-            border: none;
-            color: var(--text-sec);
-            width: 28px;
-            height: 28px;
-            border-radius: 14px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .btn-msg {
+            background: transparent; border: none; font-size: 16px; 
+            padding: 4px; opacity: 0.3; filter: grayscale(1);
         }
-        .btn-comment.active { 
-            background: rgba(36, 129, 204, 0.2); 
-            color: var(--accent); 
-        }
-
-        /* Alphabet Index */
-        .alphabet-index {
-            position: fixed;
-            right: 4px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            z-index: 100;
-        }
-        .alphabet-letter {
-            font-size: 11px;
-            color: var(--text-sec);
-            padding: 2px 4px;
-            cursor: pointer;
-        }
+        .btn-msg.active { opacity: 1; filter: none; }
 
         /* Bottom Cart */
         .bottom-cart {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1c1c1e;
             border-top: 1px solid var(--border);
             padding: 12px 16px;
-            display: none;
-            align-items: center;
-            gap: 12px;
+            display: none; align-items: center; gap: 12px;
             z-index: 999;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
         }
         .bottom-cart.visible { display: flex; }
-        .cart-summary { flex: 1; }
-        .cart-total { font-weight: 700; font-size: 18px; color: var(--accent); }
-        .cart-count-text { font-size: 13px; color: var(--text-sec); }
+        .cart-total { font-size: 16px; font-weight: 700; color: #fff; }
+        .cart-details { font-size: 12px; color: var(--text-sec); }
         .btn-checkout {
-            padding: 12px 24px;
-            border-radius: 12px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
+            margin-left: auto;
+            background: var(--accent); color: #fff;
+            border: none; padding: 10px 20px; border-radius: 10px;
+            font-weight: 600; font-size: 14px;
         }
 
         /* Modals */
         .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            display: none;
-            align-items: flex-end;
-            backdrop-filter: blur(5px);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: none; align-items: flex-end;
+            backdrop-filter: blur(4px);
         }
         .modal.visible { display: flex; }
         .modal-content {
-            background: #1c1c1e;
-            width: 100%;
-            border-radius: 20px 20px 0 0;
-            padding: 24px;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s;
-        }
-        .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
-
-        /* СИСТЕМНАЯ КЛАВИАТУРА */
-        .input-modal-body {
-            padding: 20px 0;
-        }
-        
-        .input-product-name {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            text-align: center;
-            color: var(--text-sec);
-        }
-        
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            background: rgba(0,0,0,0.3);
-            border-radius: 16px;
-            padding: 16px;
-            border: 2px solid var(--accent);
-            margin-bottom: 20px;
-        }
-        
-        .input-number {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--accent);
-            font-size: 36px;
-            font-weight: 700;
-            text-align: center;
-            outline: none;
-            width: 100%;
-        }
-        
-        .input-unit {
-            font-size: 18px;
-            color: var(--text-sec);
-            margin-left: 8px;
+            background: #1c1c1e; width: 100%;
+            border-radius: 16px 16px 0 0;
+            padding: 20px;
+            max-height: 90vh; overflow-y: auto;
         }
 
-        .comment-modal-body {
-            padding: 20px 0;
+        /* System Input Styling */
+        .input-wrap {
+            background: #000; border-radius: 12px;
+            padding: 10px; display: flex; align-items: center;
+            border: 1px solid var(--accent); margin: 15px 0;
         }
-        .comment-label {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .sys-input {
+            width: 100%; background: transparent; border: none;
+            color: #fff; font-size: 24px; text-align: center;
+            outline: none; font-weight: 700;
         }
-        .comment-textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
-            color: #fff;
-            font-size: 16px;
-            min-height: 100px;
-            font-family: inherit;
-            resize: vertical;
-        }
-        
-        .order-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-        }
-        .order-note { font-size: 13px; color: var(--text-sec); margin-top: 4px; font-style: italic; }
-        .global-comment {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
-            color: #fff;
-            font-size: 16px;
-            min-height: 100px;
-            margin: 20px 0;
-            font-family: inherit;
-        }
-        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
-        .btn-modal {
-            flex: 1;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: 700;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .btn-confirm { background: var(--accent); color: #fff; }
-        .btn-cancel { background: #3a3a3c; color: #fff; }
 
-        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .m-btn {
+            flex: 1; padding: 14px; border-radius: 10px; border: none;
+            font-size: 15px; font-weight: 600;
+        }
+        .btn-c { background: #2c2c2e; color: #fff; }
+        .btn-s { background: var(--accent); color: #fff; }
 
-        .empty { text-align: center; color: var(--text-sec); padding: 60px 20px; font-size: 16px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -537,47 +265,35 @@
                 <input type="text" class="search-input" id="search" placeholder="Поиск...">
                 <div class="autocomplete" id="autocomplete"></div>
             </div>
-            <div class="cart-badge" onclick="openCartModal()">
-                🛒
-                <span class="cart-count hidden" id="cartCount">0</span>
+            <div class="cart-badge" onclick="openCart()">
+                🛒 <span class="cart-count hidden" id="cartBadge">0</span>
             </div>
         </div>
-
-        <div class="breadcrumbs" id="breadcrumbs"></div>
-
-        <div class="filters hidden" id="filters">
-            <button class="filter-btn active" data-filter="all">Все</button>
-            <button class="filter-btn" data-filter="cheap">До 100₽</button>
-            <button class="filter-btn" data-filter="mid">100-500₽</button>
-            <button class="filter-btn" data-filter="expensive">500₽+</button>
-        </div>
+        <div class="nav-bar" id="navBar"></div>
     </div>
 
     <div class="container" id="content"></div>
-    <div class="alphabet-index hidden" id="alphabetIndex"></div>
 
     <div class="bottom-cart" id="bottomCart">
-        <div class="cart-summary">
-            <div class="cart-total" id="bottomTotal">0 ₽</div>
-            <div class="cart-count-text" id="bottomCount">0 товаров</div>
+        <div>
+            <div class="cart-total" id="cartTotal">0 ₽</div>
+            <div class="cart-details" id="cartDetails">0 товаров</div>
         </div>
-        <button class="btn-checkout" onclick="openOrderModal()">Оформить</button>
+        <button class="btn-checkout" onclick="openOrder()">Оформить</button>
     </div>
 
-    <!-- Input Modal (системная клава) -->
+    <!-- Input Modal -->
     <div class="modal" id="inputModal">
         <div class="modal-content">
-            <div class="modal-title">Укажите количество</div>
-            <div class="input-modal-body">
-                <div class="input-product-name" id="inputProductName"></div>
-                <div class="input-wrapper">
-                    <input type="number" class="input-number" id="inputNumber" step="0.1" min="0" inputmode="decimal" autofocus>
-                    <span class="input-unit" id="inputUnit"></span>
-                </div>
+            <h3 style="text-align:center; margin-bottom:10px;">Количество</h3>
+            <div id="inputName" style="text-align:center; color:#8e8e93; margin-bottom:10px;"></div>
+            <div class="input-wrap">
+                <input type="number" class="sys-input" id="sysInput" inputmode="decimal" placeholder="0">
+                <span id="inputUnit" style="color:#8e8e93; font-size:18px;">кг</span>
             </div>
-            <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="closeInputModal()">Отмена</button>
-                <button class="btn-modal btn-confirm" onclick="saveInputValue()">Готово</button>
+            <div class="modal-btns">
+                <button class="m-btn btn-c" onclick="closeModal('inputModal')">Отмена</button>
+                <button class="m-btn btn-s" onclick="saveInput()">Готово</button>
             </div>
         </div>
     </div>
@@ -585,14 +301,12 @@
     <!-- Comment Modal -->
     <div class="modal" id="commentModal">
         <div class="modal-content">
-            <div class="modal-title">Комментарий</div>
-            <div class="comment-modal-body">
-                <div class="comment-label" id="commentProductName"></div>
-                <textarea class="comment-textarea" id="commentTextarea" placeholder="Например: только спелые, крупные..."></textarea>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="closeCommentModal()">Отмена</button>
-                <button class="btn-modal btn-confirm" onclick="saveCommentFromModal()">Сохранить</button>
+            <h3>Комментарий к товару</h3>
+            <div id="comName" style="color:#8e8e93; margin:10px 0;"></div>
+            <textarea id="comText" style="width:100%; height:80px; background:#000; border:1px solid #333; color:#fff; border-radius:10px; padding:10px; font-size:16px;"></textarea>
+            <div class="modal-btns">
+                <button class="m-btn btn-c" onclick="closeModal('commentModal')">Отмена</button>
+                <button class="m-btn btn-s" onclick="saveComment()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -600,12 +314,12 @@
     <!-- Order Modal -->
     <div class="modal" id="orderModal">
         <div class="modal-content">
-            <div class="modal-title">Ваш заказ</div>
-            <div id="orderSummary"></div>
-            <textarea class="global-comment" id="globalComment" placeholder="Комментарий к заказу..."></textarea>
-            <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="closeOrderModal()">Назад</button>
-                <button class="btn-modal btn-confirm" onclick="sendOrder()">Отправить</button>
+            <h3>Ваш заказ</h3>
+            <div id="orderList" style="margin:15px 0;"></div>
+            <textarea id="globalCom" placeholder="Общий комментарий..." style="width:100%; height:60px; background:#000; border:1px solid #333; color:#fff; border-radius:10px; padding:10px;"></textarea>
+            <div class="modal-btns">
+                <button class="m-btn btn-c" onclick="closeModal('orderModal')">Назад</button>
+                <button class="m-btn btn-s" onclick="sendData()">Отправить</button>
             </div>
         </div>
     </div>
@@ -616,599 +330,491 @@
     tg.setHeaderColor('#1c1c1e');
     tg.setBackgroundColor('#0f0f0f');
 
+    // === ПОЛНАЯ БАЗА ДАННЫХ ===
     const DB = {
-  "veg": {
-    "name": "Овощи",
-    "icon": "🥦",
-    "subs": {
-      "tomatoes": {
-        "name": "🍅 Томаты",
-        "items": [
-          {"id": "tom_kra", "name": "Томат Краснодар", "price": 410, "unit": "кг"},
-          {"id": "tom_yel", "name": "Томат желтый", "price": 560, "unit": "кг"},
-          {"id": "tom_slv", "name": "Томат сливка", "price": 295, "unit": "кг"},
-          {"id": "tom_uzb", "name": "Томат Узбекистан", "price": 780, "unit": "кг"},
-          {"id": "tom_aze", "name": "Томат Азербайджан", "price": 425, "unit": "кг"},
-          {"id": "tom_dag", "name": "Томат Дагестан", "price": 385, "unit": "кг"},
-          {"id": "tom_che", "name": "Томат черри красный", "price": 840, "unit": "кг"},
-          {"id": "tom_kum", "name": "Томат кумато", "price": 560, "unit": "кг"}
-        ]
-      },
-      "cucumbers": {
-        "name": "🥒 Огурцы",
-        "items": [
-          {"id": "cuc_bak", "name": "Огурцы бакинские", "price": 520, "unit": "кг"},
-          {"id": "cuc_lng", "name": "Огурец длинноплодный", "price": 475, "unit": "кг"},
-          {"id": "cuc_kur", "name": "Огурцы Кураж", "price": 395, "unit": "кг"}
-        ]
-      },
-      "cabbage": {
-        "name": "🥬 Капуста",
-        "items": [
-          {"id": "cab_bk", "name": "Капуста б/к", "price": 38, "unit": "кг"},
-          {"id": "cab_bro", "name": "Капуста брокколи", "price": 345, "unit": "кг"},
-          {"id": "cab_red", "name": "Капуста краснокочанная", "price": 105, "unit": "кг"},
-          {"id": "cab_pek", "name": "Капуста Пекинская", "price": 77, "unit": "кг"},
-          {"id": "cab_col", "name": "Капуста цветная", "price": 145, "unit": "кг"}
-        ]
-      },
-      "potatoes": {
-        "name": "🥔 Картофель",
-        "items": [
-          {"id": "pot_bat", "name": "Картофель Батат", "price": 210, "unit": "кг"},
-          {"id": "pot_bab", "name": "Картофель бэби", "price": 85, "unit": "кг"},
-          {"id": "pot_gal", "name": "Картофель Гала", "price": 50, "unit": "кг"},
-          {"id": "pot_red", "name": "Картофель мытый красный", "price": 59, "unit": "кг"}
-        ]
-      },
-      "onions": {
-        "name": "🧅 Лук",
-        "items": [
-          {"id": "luk_wh", "name": "Лук белый", "price": 126, "unit": "кг"},
-          {"id": "luk_gr", "name": "Лук зеленый", "price": 700, "unit": "кг"},
-          {"id": "luk_red", "name": "Лук красный", "price": 65, "unit": "кг"},
-          {"id": "luk_rep", "name": "Лук репчатый", "price": 44, "unit": "кг"}
-        ]
-      },
-      "peppers": {
-        "name": "🌶️ Перец",
-        "items": [
-          {"id": "pep_yel", "name": "Перец болгарский желтый", "price": 255, "unit": "кг"},
-          {"id": "pep_grn", "name": "Перец болгарский зеленый", "price": 235, "unit": "кг"},
-          {"id": "pep_red", "name": "Перец болгарский красный", "price": 265, "unit": "кг"},
-          {"id": "chil_rd", "name": "Перец Чили красный", "price": 490, "unit": "кг"}
-        ]
-      },
-      "other": {
-        "name": "🥕 Другое",
-        "items": [
-          {"id": "bakl", "name": "Баклажан", "price": 175, "unit": "кг"},
-          {"id": "mor_myt", "name": "Морковь мытая", "price": 65, "unit": "кг"},
-          {"id": "svek", "name": "Свекла", "price": 49, "unit": "кг"},
-          {"id": "ches", "name": "Чеснок", "price": 266, "unit": "кг"},
-          {"id": "imbir", "name": "Имбирь корень", "price": 495, "unit": "кг"},
-          {"id": "zuk", "name": "Цуккини зеленые", "price": 425, "unit": "кг"}
-        ]
-      }
-    }
-  },
-  "grn": {
-    "name": "Зелень",
-    "icon": "🌿",
-    "items": [
-      {"id": "baz_gr", "name": "Базилик зеленый", "price": 2240, "unit": "кг"},
-      {"id": "kinza", "name": "Кинза", "price": 630, "unit": "кг"},
-      {"id": "petr", "name": "Петрушка", "price": 280, "unit": "кг"},
-      {"id": "ukr", "name": "Укроп", "price": 290, "unit": "кг"},
-      {"id": "myata", "name": "Мята свежая", "price": 1250, "unit": "кг"},
-      {"id": "sal_ice", "name": "Салат Айсберг", "price": 265, "unit": "кг"},
-      {"id": "sal_ruk", "name": "Салат Руккола", "price": 1650, "unit": "кг"},
-      {"id": "spin", "name": "Шпинат", "price": 770, "unit": "кг"}
-    ]
-  },
-  "fru": {
-    "name": "Фрукты",
-    "icon": "🍎",
-    "items": [
-      {"id": "avo", "name": "Авокадо", "price": 585, "unit": "кг"},
-      {"id": "anan", "name": "Ананас Голд", "price": 295, "unit": "кг"},
-      {"id": "apel", "name": "Апельсин", "price": 145, "unit": "кг"},
-      {"id": "banan", "name": "Банан", "price": 175, "unit": "кг"},
-      {"id": "vin_wh", "name": "Виноград белый", "price": 560, "unit": "кг"},
-      {"id": "gran", "name": "Гранат", "price": 420, "unit": "кг"},
-      {"id": "kiwi", "name": "Киви", "price": 175, "unit": "кг"},
-      {"id": "limon", "name": "Лимон", "price": 345, "unit": "кг"},
-      {"id": "mango", "name": "Манго Египет", "price": 755, "unit": "кг"},
-      {"id": "mand", "name": "Мандарин", "price": 235, "unit": "кг"},
-      {"id": "yab_gol", "name": "Яблоки Голден", "price": 210, "unit": "кг"}
-    ]
-  },
-  "ber": {
-    "name": "Ягоды",
-    "icon": "🍓",
-    "items": [
-      {"id": "golub", "name": "Голубика", "price": 1850, "unit": "кг"},
-      {"id": "klub", "name": "Клубника", "price": 1450, "unit": "кг"},
-      {"id": "malina", "name": "Малина", "price": 3420, "unit": "кг"}
-    ]
-  },
-  "mus": {
-    "name": "Грибы",
-    "icon": "🍄",
-    "items": [
-      {"id": "vesh", "name": "Вешенки", "price": 585, "unit": "кг"},
-      {"id": "shamp", "name": "Шампиньоны", "price": 310, "unit": "кг"},
-      {"id": "shiit", "name": "Грибы Шиитаки", "price": 1150, "unit": "кг"}
-    ]
-  }
-};
-
-    let cart = {};
-    let comments = {};
-    let currentView = 'home';
-    let currentCat = null;
-    let currentSub = null;
-    let priceFilter = 'all';
-    let allItems = [];
-    let fuse;
-    let currentCommentItemId = null;
-    let currentInputItemId = null;
-
-    function buildItemsList() {
-        allItems = [];
-        Object.keys(DB).forEach(catKey => {
-            const cat = DB[catKey];
-            if (cat.items) {
-                cat.items.forEach(i => allItems.push({...i, catKey}));
+        "veg": {
+            "name": "Овощи", "icon": "🥦",
+            "subs": {
+                "roots": { "name": "🥕 Корнеплоды", "items": [
+                    { "id": "galan", "name": "Галангал корень", "price": 1820, "unit": "кг" },
+                    { "id": "daik", "name": "Дайкон", "price": 126, "unit": "кг" },
+                    { "id": "imbir", "name": "Имбирь корень", "price": 495, "unit": "кг" },
+                    { "id": "mor_yel", "name": "Морковь желтая", "price": 80, "unit": "кг" },
+                    { "id": "mor_myt", "name": "Морковь мытая", "price": 65, "unit": "кг" },
+                    { "id": "mor_ros", "name": "Морковь Россия", "price": 48, "unit": "кг" },
+                    { "id": "mor_bot", "name": "Морковь с ботвой", "price": 650, "unit": "кг" },
+                    { "id": "past", "name": "Пастернак", "price": 565, "unit": "кг" },
+                    { "id": "rad_red", "name": "Редис красный", "price": 210, "unit": "кг" },
+                    { "id": "red_arb", "name": "Редька арбузная", "price": 350, "unit": "кг" },
+                    { "id": "rad_bot", "name": "Редис красный с ботвой", "price": 510, "unit": "кг" },
+                    { "id": "repa", "name": "Репа", "price": 85, "unit": "кг" },
+                    { "id": "svek", "name": "Свекла", "price": 49, "unit": "кг" },
+                    { "id": "seld_kor", "name": "Корень сельдерея", "price": 195, "unit": "кг" },
+                    { "id": "topin", "name": "Топинамбур", "price": 420, "unit": "кг" },
+                    { "id": "hren", "name": "Хрен корень", "price": 2100, "unit": "кг" }
+                ]},
+                "tomatoes": { "name": "🍅 Томаты", "items": [
+                    { "id": "tom_kra", "name": "Томат Краснодар", "price": 410, "unit": "кг" },
+                    { "id": "tom_yel", "name": "Томат желтый", "price": 560, "unit": "кг" },
+                    { "id": "tom_slv", "name": "Томат красный сливка", "price": 295, "unit": "кг" },
+                    { "id": "tom_gri", "name": "Томат Гриль", "price": 425, "unit": "кг" },
+                    { "id": "tom_uzb_l", "name": "Томат Узбекистан (Люкс)", "price": 980, "unit": "кг" },
+                    { "id": "tom_uzb", "name": "Томат Узбекистан", "price": 780, "unit": "кг" },
+                    { "id": "tom_aze", "name": "Томат Азербайджан", "price": 425, "unit": "кг" },
+                    { "id": "tom_dag", "name": "Томат Дагестан", "price": 385, "unit": "кг" },
+                    { "id": "tom_che_y", "name": "Томат черри желтые", "price": 700, "unit": "кг" },
+                    { "id": "tom_che_r", "name": "Томат черри красный", "price": 840, "unit": "кг" },
+                    { "id": "tom_che_k", "name": "Томат черри кумато", "price": 840, "unit": "кг" },
+                    { "id": "tom_che_m", "name": "Томат черри медовые", "price": 910, "unit": "кг" },
+                    { "id": "tom_che_s", "name": "Томат черри мини сливка", "price": 910, "unit": "кг" },
+                    { "id": "tom_che_v", "name": "Томат черри на ветке", "price": 910, "unit": "кг" },
+                    { "id": "tom_che_mix", "name": "Томаты Черри Микс", "price": 910, "unit": "кг" },
+                    { "id": "tom_kum", "name": "Томат кумато", "price": 560, "unit": "кг" },
+                    { "id": "tom_ban", "name": "Томат Банч", "price": 210, "unit": "кг" }
+                ]},
+                "cucumbers": { "name": "🥒 Огурцы", "items": [
+                    { "id": "cuc_bak", "name": "Огурцы бакинские", "price": 520, "unit": "кг" },
+                    { "id": "cuc_lng", "name": "Огурец длинноплодный", "price": 475, "unit": "кг" },
+                    { "id": "cuc_kur", "name": "Огурцы Кураж", "price": 395, "unit": "кг" },
+                    { "id": "cuc_lux", "name": "Огурцы Люкс/Миринда", "price": 590, "unit": "кг" }
+                ]},
+                "potatoes": { "name": "🥔 Картофель", "items": [
+                    { "id": "pot_bat", "name": "Картофель Батат", "price": 210, "unit": "кг" },
+                    { "id": "pot_bab", "name": "Картофель бэби", "price": 85, "unit": "кг" },
+                    { "id": "pot_bab_s", "name": "Картофель бэби синеглазка", "price": 126, "unit": "кг" },
+                    { "id": "pot_gal", "name": "Картофель Гала", "price": 50, "unit": "кг" },
+                    { "id": "pot_gri", "name": "Картофель гриль", "price": 70, "unit": "кг" },
+                    { "id": "pot_red_d", "name": "Картофель красный (грязный)", "price": 56, "unit": "кг" },
+                    { "id": "pot_red_m", "name": "Картофель мытый красный", "price": 59, "unit": "кг" },
+                    { "id": "pot_myt", "name": "Картофель мытый", "price": 63, "unit": "кг" }
+                ]},
+                "cabbage": { "name": "🥬 Капуста", "items": [
+                    { "id": "cab_bk", "name": "Капуста б/к", "price": 38, "unit": "кг" },
+                    { "id": "cab_bro", "name": "Капуста брокколи", "price": 345, "unit": "кг" },
+                    { "id": "cab_bro_cal", "name": "Капуста брокколи (калибр)", "price": 490, "unit": "кг" },
+                    { "id": "cab_bru", "name": "Капуста брюссельская", "price": 2520, "unit": "кг" },
+                    { "id": "cab_kol", "name": "Капуста кольраби", "price": 490, "unit": "кг" },
+                    { "id": "cab_red", "name": "Капуста краснокочанная", "price": 105, "unit": "кг" },
+                    { "id": "cab_mol", "name": "Капуста молодая", "price": 126, "unit": "кг" },
+                    { "id": "cab_mol_s", "name": "Капуста молодая салатная", "price": 255, "unit": "кг" },
+                    { "id": "cab_pek", "name": "Капуста Пекинская", "price": 77, "unit": "кг" },
+                    { "id": "cab_sav", "name": "Капуста Савойская", "price": 490, "unit": "кг" },
+                    { "id": "cab_col", "name": "Капуста цветная", "price": 145, "unit": "кг" },
+                    { "id": "cab_col_cal", "name": "Капуста цветная (калибр)", "price": 265, "unit": "кг" },
+                    { "id": "kale", "name": "Кейл", "price": 2650, "unit": "кг" }
+                ]},
+                "onions": { "name": "🧅 Лук и Чеснок", "items": [
+                    { "id": "luk_wh", "name": "Лук белый", "price": 126, "unit": "кг" },
+                    { "id": "luk_gr_kor", "name": "Лук зеленый с корешками", "price": 940, "unit": "кг" },
+                    { "id": "luk_gr", "name": "Лук зеленый", "price": 700, "unit": "кг" },
+                    { "id": "luk_red", "name": "Лук красный", "price": 65, "unit": "кг" },
+                    { "id": "luk_yal", "name": "Лук крымский", "price": 115, "unit": "кг" },
+                    { "id": "luk_por", "name": "Лук порей", "price": 420, "unit": "кг" },
+                    { "id": "luk_rep", "name": "Лук репчатый", "price": 44, "unit": "кг" },
+                    { "id": "luk_rep_big", "name": "Лук репчатый крупный", "price": 48, "unit": "кг" },
+                    { "id": "luk_sib", "name": "Лук сибулет", "price": 3500, "unit": "кг" },
+                    { "id": "luk_sha", "name": "Лук шалот", "price": 420, "unit": "кг" },
+                    { "id": "ches", "name": "Чеснок", "price": 266, "unit": "кг" },
+                    { "id": "ches_mol", "name": "Чеснок молодой", "price": 490, "unit": "кг" }
+                ]},
+                "peppers": { "name": "🌶️ Перцы", "items": [
+                    { "id": "pep_yel", "name": "Перец болгарский желтый", "price": 255, "unit": "кг" },
+                    { "id": "pep_grn", "name": "Перец болгарский зеленый", "price": 235, "unit": "кг" },
+                    { "id": "pep_red", "name": "Перец болгарский красный", "price": 265, "unit": "кг" },
+                    { "id": "pep_gr_red", "name": "Перец грунт красный", "price": 238, "unit": "кг" },
+                    { "id": "pep_ram", "name": "Перец Рамиро", "price": 575, "unit": "кг" },
+                    { "id": "chil_gr_arm", "name": "Перец Чили зеленый (Арм)", "price": 1820, "unit": "кг" },
+                    { "id": "chil_gr", "name": "Перец Чили зеленый", "price": 490, "unit": "кг" },
+                    { "id": "chil_rd", "name": "Перец Чили красный", "price": 490, "unit": "кг" },
+                    { "id": "chil_thai", "name": "Перец Чили Тайский (80г)", "price": 145, "unit": "уп" }
+                ]},
+                "other": { "name": "🍆 Другие овощи", "items": [
+                    { "id": "art_gr", "name": "Артишоки зеленые", "price": 2320, "unit": "кг" },
+                    { "id": "art_vi", "name": "Артишоки фиолетовые", "price": 2320, "unit": "кг" },
+                    { "id": "bakl", "name": "Баклажан", "price": 175, "unit": "кг" },
+                    { "id": "bakl_gr", "name": "Баклажан грунтовой", "price": 196, "unit": "кг" },
+                    { "id": "goroh", "name": "Горох стручковый (Кения)", "price": 2240, "unit": "кг" },
+                    { "id": "kab_wh", "name": "Кабачок белый", "price": 475, "unit": "кг" },
+                    { "id": "kuk", "name": "Кукуруза свежая", "price": 0, "unit": "кг" },
+                    { "id": "seld_st", "name": "Стебель сельдерея", "price": 165, "unit": "кг" },
+                    { "id": "spar", "name": "Спаржа зеленая", "price": 2250, "unit": "кг" },
+                    { "id": "tyk_bat", "name": "Тыква Баттернат", "price": 49, "unit": "кг" },
+                    { "id": "tyk_rou", "name": "Тыква круглая", "price": 92, "unit": "кг" },
+                    { "id": "fasol", "name": "Фасоль стручковая (Кения)", "price": 2450, "unit": "кг" },
+                    { "id": "fenhel", "name": "Фенхель", "price": 495, "unit": "кг" },
+                    { "id": "zuk", "name": "Цуккини зеленые", "price": 425, "unit": "кг" }
+                ]}
             }
-            if (cat.subs) {
-                Object.keys(cat.subs).forEach(subKey => {
-                    cat.subs[subKey].items.forEach(i => allItems.push({...i, catKey, subKey}));
-                });
+        },
+        "grn": {
+            "name": "Зелень", "icon": "🌿",
+            "subs": {
+                "spicy": { "name": "🌿 Пряные травы", "items": [
+                    { "id": "baz_pot", "name": "Базилик в горшочке", "price": 0, "unit": "шт" },
+                    { "id": "baz_gr_iz", "name": "Базилик зеленый (Израиль)", "price": 2240, "unit": "кг" },
+                    { "id": "baz_rd", "name": "Базилик красный", "price": 3250, "unit": "кг" },
+                    { "id": "kerv", "name": "Кервель", "price": 1400, "unit": "кг" },
+                    { "id": "kinza", "name": "Кинза", "price": 630, "unit": "кг" },
+                    { "id": "myata", "name": "Мята свежая", "price": 1250, "unit": "кг" },
+                    { "id": "petr", "name": "Петрушка", "price": 280, "unit": "кг" },
+                    { "id": "petr_kud", "name": "Петрушка кудрявая", "price": 980, "unit": "кг" },
+                    { "id": "rozm", "name": "Розмарин", "price": 1120, "unit": "кг" },
+                    { "id": "tim", "name": "Тимьян", "price": 2240, "unit": "кг" },
+                    { "id": "ukr", "name": "Укроп", "price": 290, "unit": "кг" },
+                    { "id": "shal", "name": "Шалфей", "price": 2100, "unit": "кг" },
+                    { "id": "estr", "name": "Эстрагон", "price": 3650, "unit": "кг" }
+                ]},
+                "lettuce": { "name": "🥗 Салаты", "items": [
+                    { "id": "mang_gr", "name": "Мангольд зеленый (125г)", "price": 420, "unit": "уп" },
+                    { "id": "mang_rd", "name": "Мангольд фиолетовый (125г)", "price": 420, "unit": "уп" },
+                    { "id": "mix_sal", "name": "Микс салат", "price": 232, "unit": "кг" },
+                    { "id": "min_spin", "name": "Мини шпинат (125г)", "price": 232, "unit": "уп" },
+                    { "id": "rost_soi", "name": "Ростки сои", "price": 199, "unit": "кг" },
+                    { "id": "sal_ice", "name": "Салат Айсберг", "price": 265, "unit": "кг" },
+                    { "id": "sal_corn", "name": "Салат корн (125гр)", "price": 350, "unit": "уп" },
+                    { "id": "sal_lat", "name": "Салат латук", "price": 180, "unit": "кг" },
+                    { "id": "sal_lol", "name": "Салат Лолло Россо", "price": 980, "unit": "кг" },
+                    { "id": "sal_pak", "name": "Салат Пак Чой", "price": 645, "unit": "кг" },
+                    { "id": "sal_pak_min", "name": "Салат Пак Чой мини", "price": 2550, "unit": "кг" },
+                    { "id": "sal_rad", "name": "Салат Радичио", "price": 1250, "unit": "кг" },
+                    { "id": "sal_rom", "name": "Салат Романо", "price": 215, "unit": "кг" },
+                    { "id": "sal_rom_min", "name": "Салат Романо мини", "price": 2750, "unit": "кг" },
+                    { "id": "sal_ruk", "name": "Салат Руккола вес", "price": 1650, "unit": "кг" },
+                    { "id": "sal_ruk_lux", "name": "Салат Руккола Люкс (125г)", "price": 235, "unit": "уп" },
+                    { "id": "sal_fri", "name": "Салат Фризе", "price": 2850, "unit": "кг" },
+                    { "id": "sal_fril", "name": "Салат Фриллис", "price": 215, "unit": "кг" },
+                    { "id": "sal_mos", "name": "Салат московский", "price": 145, "unit": "кг" },
+                    { "id": "sats", "name": "Сацимати", "price": 1680, "unit": "кг" },
+                    { "id": "spin", "name": "Шпинат", "price": 770, "unit": "кг" },
+                    { "id": "shav", "name": "Щавель", "price": 840, "unit": "кг" }
+                ]},
+                "micro": { "name": "🌱 Микрозелень", "items": [
+                    { "id": "mic_an", "name": "Микрозелень Анютины глазки", "price": 700, "unit": "уп" },
+                    { "id": "mic_baz", "name": "Микрозелень Базилик зеленый", "price": 425, "unit": "уп" },
+                    { "id": "mic_vas", "name": "Микрозелень Василек", "price": 700, "unit": "уп" },
+                    { "id": "mic_gor", "name": "Микрозелень горох", "price": 350, "unit": "уп" },
+                    { "id": "mic_kis", "name": "Микрозелень Кислица", "price": 420, "unit": "уп" },
+                    { "id": "mic_kor", "name": "Микрозелень Кориандр", "price": 420, "unit": "уп" },
+                    { "id": "mic_mel", "name": "Микрозелень Мелисса", "price": 420, "unit": "уп" },
+                    { "id": "mic_shav", "name": "Микрозелень щавель", "price": 350, "unit": "уп" }
+                ]},
+                "exotic_grn": { "name": "🎋 Экзотика", "items": [
+                    { "id": "lemon", "name": "Лемонграсс", "price": 1270, "unit": "кг" },
+                    { "id": "list_bam", "name": "Лист бамбука", "price": 585, "unit": "кг" },
+                    { "id": "list_ban", "name": "Лист банана", "price": 1960, "unit": "кг" },
+                    { "id": "list_lime", "name": "Лист лайма (100г)", "price": 365, "unit": "уп" },
+                    { "id": "list_svek", "name": "Лист свеклы", "price": 700, "unit": "кг" },
+                    { "id": "list_seld", "name": "Листья сельдерея", "price": 645, "unit": "кг" }
+                ]}
             }
-        });
-        
-        fuse = new Fuse(allItems, {
-            keys: ['name'],
-            threshold: 0.3,
-            distance: 100
-        });
-    }
+        },
+        "fru": {
+            "name": "Фрукты", "icon": "🍎",
+            "subs": {
+                "citrus": { "name": "🍊 Цитрусовые", "items": [
+                    { "id": "apel", "name": "Апельсин", "price": 145, "unit": "кг" },
+                    { "id": "apel_soc", "name": "Апельсин для сока", "price": 140, "unit": "кг" },
+                    { "id": "apel_red", "name": "Апельсин красный", "price": 350, "unit": "кг" },
+                    { "id": "grape", "name": "Грейпфрут", "price": 196, "unit": "кг" },
+                    { "id": "kum", "name": "Кумкват", "price": 2650, "unit": "кг" },
+                    { "id": "lime", "name": "Лайм", "price": 465, "unit": "кг" },
+                    { "id": "limon", "name": "Лимон", "price": 345, "unit": "кг" },
+                    { "id": "lim_uzb", "name": "Лимон Узбекистан", "price": 720, "unit": "кг" },
+                    { "id": "mand_abh", "name": "Мандарин Абхазия", "price": 355, "unit": "кг" },
+                    { "id": "mand", "name": "Мандарин", "price": 235, "unit": "кг" },
+                    { "id": "mand_vet", "name": "Мандарины на веточке", "price": 295, "unit": "кг" },
+                    { "id": "pomelo", "name": "Помело", "price": 285, "unit": "кг" }
+                ]},
+                "exotic": { "name": "🥭 Экзотика", "items": [
+                    { "id": "avo", "name": "Авокадо", "price": 585, "unit": "кг" },
+                    { "id": "avo_has", "name": "Авокадо Хасс", "price": 630, "unit": "кг" },
+                    { "id": "avo_rou", "name": "Авокадо круглый", "price": 620, "unit": "кг" },
+                    { "id": "anan", "name": "Ананас Голд", "price": 295, "unit": "кг" },
+                    { "id": "anan_prem", "name": "Ананас премиум", "price": 455, "unit": "кг" },
+                    { "id": "banan", "name": "Банан", "price": 175, "unit": "кг" },
+                    { "id": "kiwi", "name": "Киви", "price": 175, "unit": "кг" },
+                    { "id": "kiwi_gold", "name": "Киви Голд", "price": 1180, "unit": "кг" },
+                    { "id": "mango_per", "name": "Манго премиум Перу", "price": 1890, "unit": "кг" },
+                    { "id": "mango_eg", "name": "Манго Египет", "price": 755, "unit": "кг" },
+                    { "id": "mara", "name": "Маракуйя", "price": 1250, "unit": "кг" },
+                    { "id": "papa", "name": "Папайя", "price": 2240, "unit": "кг" },
+                    { "id": "pita_red", "name": "Питахайя красная", "price": 770, "unit": "кг" },
+                    { "id": "pita_wh", "name": "Питахайя белая", "price": 650, "unit": "кг" },
+                    { "id": "fei", "name": "Фейхоа", "price": 1260, "unit": "кг" },
+                    { "id": "hurma", "name": "Хурма", "price": 310, "unit": "кг" },
+                    { "id": "hurma_isp", "name": "Хурма Испания", "price": 700, "unit": "кг" }
+                ]},
+                "classic": { "name": "🍏 Классика", "items": [
+                    { "id": "aiva", "name": "Айва", "price": 355, "unit": "кг" },
+                    { "id": "vin_wh", "name": "Виноград белый б/к", "price": 560, "unit": "кг" },
+                    { "id": "vin_rd", "name": "Виноград красный б/к", "price": 685, "unit": "кг" },
+                    { "id": "vin_gr_ch", "name": "Виноград Зеленый (Китай)", "price": 685, "unit": "кг" },
+                    { "id": "gran", "name": "Гранат", "price": 420, "unit": "кг" },
+                    { "id": "gran_soc", "name": "Гранат соковый", "price": 250, "unit": "кг" },
+                    { "id": "gru_con", "name": "Груша конференция", "price": 395, "unit": "кг" },
+                    { "id": "gru_for", "name": "Груша Форель", "price": 385, "unit": "кг" },
+                    { "id": "gru_chi", "name": "Груша китайская", "price": 350, "unit": "кг" },
+                    { "id": "sliva", "name": "Слива черная", "price": 484, "unit": "кг" },
+                    { "id": "yab_gol", "name": "Яблоки Голден", "price": 210, "unit": "кг" },
+                    { "id": "yab_gre", "name": "Яблоки Гренни Смит", "price": 182, "unit": "кг" },
+                    { "id": "yab_red", "name": "Яблоки красные Айдаред", "price": 185, "unit": "кг" },
+                    { "id": "yab_sem", "name": "Яблоки Семеренко", "price": 210, "unit": "кг" }
+                ]}
+            }
+        },
+        "ber": {
+            "name": "Ягоды", "icon": "🍓", "items": [
+                { "id": "golub", "name": "Голубика", "price": 1850, "unit": "кг" },
+                { "id": "eje", "name": "Ежевика", "price": 5600, "unit": "кг" },
+                { "id": "klub", "name": "Клубника", "price": 1450, "unit": "кг" },
+                { "id": "malina", "name": "Малина", "price": 3420, "unit": "кг" },
+                { "id": "smor", "name": "Смородина красная", "price": 5250, "unit": "кг" },
+                { "id": "fiz", "name": "Физалис", "price": 210, "unit": "шт" }
+            ]
+        },
+        "mus": {
+            "name": "Грибы", "icon": "🍄", "items": [
+                { "id": "vesh", "name": "Вешенки", "price": 585, "unit": "кг" },
+                { "id": "shamp", "name": "Шампиньоны", "price": 310, "unit": "кг" },
+                { "id": "shiit", "name": "Грибы Шиитаки", "price": 1150, "unit": "кг" },
+                { "id": "shim", "name": "Грибы Шимиджи (150г)", "price": 280, "unit": "шт" }
+            ]
+        }
+    };
+
+    let cart = {}, comments = {};
+    let currentView = 'home', curCat = null, curSub = null;
+    let allItems = [], fuse, curItem = null;
 
     function init() {
-        buildItemsList();
+        // Flatten DB
+        Object.keys(DB).forEach(k => {
+            const c = DB[k];
+            if(c.items) c.items.forEach(i => allItems.push({...i, cat:k}));
+            if(c.subs) Object.keys(c.subs).forEach(sk => {
+                c.subs[sk].items.forEach(i => allItems.push({...i, cat:k, sub:sk}));
+            });
+        });
+        fuse = new Fuse(allItems, { keys:['name'], threshold:0.3 });
+        
         renderHome();
         setupSearch();
-        setupFilters();
     }
 
     function renderHome() {
         currentView = 'home';
-        currentCat = null;
-        currentSub = null;
+        document.getElementById('navBar').innerHTML = '';
         
-        updateBreadcrumbs([{name: 'Главная', action: () => renderHome()}]);
-        
-        const c = document.getElementById('content');
-        c.innerHTML = '<div class="home-categories" id="homeCategories"></div>';
-
-        const homeCat = document.getElementById('homeCategories');
-        Object.keys(DB).forEach(key => {
-            homeCat.appendChild(createHomeCategoryCard(key, DB[key]));
-        });
-
-        document.getElementById('filters').classList.add('hidden');
-        document.getElementById('alphabetIndex').classList.add('hidden');
-    }
-
-    function createHomeCategoryCard(key, cat) {
-        const card = document.createElement('div');
-        card.className = 'home-category-card';
-        
-        let count = 0;
-        let itemCount = 0;
-        
-        if (cat.items) {
-            itemCount = cat.items.length;
-            cat.items.forEach(i => { if (cart[i.id]) count++; });
-        }
-        if (cat.subs) {
-            Object.values(cat.subs).forEach(sub => {
-                itemCount += sub.items.length;
-                sub.items.forEach(i => { if (cart[i.id]) count++; });
-            });
-        }
-
-        card.innerHTML = `
-            ${count > 0 ? `<div class="home-category-badge">${count}</div>` : ''}
-            <div class="home-category-icon">${cat.icon}</div>
-            <div class="home-category-name">${cat.name}</div>
-            <div class="home-category-count">${itemCount} ${declension(itemCount, ['позиция', 'позиции', 'позиций'])}</div>
-        `;
-        card.onclick = () => renderCategory(key);
-        return card;
-    }
-
-    function renderCategory(catKey) {
-        currentView = 'category';
-        currentCat = catKey;
-        currentSub = null;
-        
-        const cat = DB[catKey];
-        updateBreadcrumbs([
-            {name: 'Главная', action: () => renderHome()},
-            {name: cat.name, action: null}
-        ]);
-
-        const c = document.getElementById('content');
-        
-        if (cat.subs) {
-            c.innerHTML = `
-                <div class="section-title">${cat.name}</div>
-                <div class="category-grid" id="subGrid"></div>
-            `;
-            const subGrid = document.getElementById('subGrid');
-            Object.keys(cat.subs).forEach(subKey => {
-                const sub = cat.subs[subKey];
-                const card = document.createElement('div');
-                card.className = 'category-card';
-                card.innerHTML = `
-                    <div class="category-icon">${sub.name.split(' ')[0]}</div>
-                    <div class="category-name">${sub.name.split(' ').slice(1).join(' ')}</div>
-                `;
-                card.onclick = () => renderSubcategory(catKey, subKey);
-                subGrid.appendChild(card);
-            });
-        } else {
-            renderItems(cat.items);
-        }
-
-        document.getElementById('filters').classList.remove('hidden');
-    }
-
-    function renderSubcategory(catKey, subKey) {
-        currentView = 'subcategory';
-        currentCat = catKey;
-        currentSub = subKey;
-        
-        const cat = DB[catKey];
-        const sub = cat.subs[subKey];
-        
-        updateBreadcrumbs([
-            {name: 'Главная', action: () => renderHome()},
-            {name: cat.name, action: () => renderCategory(catKey)},
-            {name: sub.name, action: null}
-        ]);
-
-        renderItems(sub.items);
-        document.getElementById('filters').classList.remove('hidden');
-    }
-
-    function renderItems(items) {
-        const filtered = filterByPrice(items);
-        const c = document.getElementById('content');
-        
-        if (filtered.length === 0) {
-            c.innerHTML = '<div class="empty">Ничего не найдено</div>';
-            return;
-        }
-
-        const grouped = {};
-        filtered.forEach(item => {
-            const letter = item.name[0].toUpperCase();
-            if (!grouped[letter]) grouped[letter] = [];
-            grouped[letter].push(item);
-        });
-
-        c.innerHTML = '';
-        Object.keys(grouped).sort().forEach(letter => {
-            const title = document.createElement('div');
-            title.className = 'section-title';
-            title.id = `letter-${letter}`;
-            title.innerText = letter;
-            c.appendChild(title);
-
-            const grid = document.createElement('div');
-            grid.className = 'product-grid';
-            grouped[letter].forEach(item => {
-                grid.appendChild(createProductCard(item));
-            });
-            c.appendChild(grid);
-        });
-
-        renderAlphabetIndex(Object.keys(grouped).sort());
-    }
-
-    function createProductCard(item) {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        
-        const qty = cart[item.id] || 0;
-        const hasComment = comments[item.id] && comments[item.id].trim().length > 0;
-        
-        card.innerHTML = `
-            <div class="product-header">
-                <div class="product-info">
-                    <div class="product-name">${item.name}</div>
-                    <div class="product-meta">
-                        <span class="product-price">${item.price}₽</span>
-                        <span class="product-unit">/ ${item.unit}</span>
-                    </div>
+        let html = '';
+        Object.keys(DB).forEach(k => {
+            let cat = DB[k], cnt = 0;
+            if(cat.items) cat.items.forEach(i => { if(cart[i.id]) cnt++; });
+            if(cat.subs) Object.values(cat.subs).forEach(s => s.items.forEach(i => { if(cart[i.id]) cnt++; }));
+            
+            html += `
+                <div class="category-card" onclick="renderCategory('${k}')">
+                    ${cnt ? `<div class="cat-badge">${cnt}</div>` : ''}
+                    <div class="cat-icon">${cat.icon}</div>
+                    <div class="cat-name">${cat.name}</div>
                 </div>
-                <div class="product-actions">
-                    <div id="btn-${item.id}">
-                        ${qty > 0 ? getCounterHtml(item.id, qty, item.unit) : `<button class="btn-add" onclick="addItem('${item.id}')">+</button>`}
+            `;
+        });
+        document.getElementById('content').innerHTML = `<div class="home-categories">${html}</div>`;
+    }
+
+    function renderCategory(k) {
+        currentView = 'cat'; curCat = k;
+        const cat = DB[k];
+        
+        renderNav('Главная', renderHome);
+        
+        if(cat.subs) {
+            let html = '';
+            Object.keys(cat.subs).forEach(sk => {
+                const sub = cat.subs[sk];
+                html += `
+                    <div class="category-card" onclick="renderSub('${k}','${sk}')">
+                        <div class="cat-icon">${sub.name.split(' ')[0]}</div>
+                        <div class="cat-name">${sub.name.substring(2)}</div>
                     </div>
-                    ${qty > 0 ? `<button class="btn-comment ${hasComment?'active':''}" onclick="openCommentModal('${item.id}')">💬</button>` : ''}
+                `;
+            });
+            document.getElementById('content').innerHTML = `
+                <div class="section-title">${cat.name}</div>
+                <div class="category-grid">${html}</div>
+            `;
+        } else {
+            renderList(cat.items, cat.name);
+        }
+    }
+
+    function renderSub(k, sk) {
+        currentView = 'sub'; curCat = k; curSub = sk;
+        const sub = DB[k].subs[sk];
+        renderNav(DB[k].name, () => renderCategory(k));
+        renderList(sub.items, sub.name);
+    }
+
+    function renderNav(label, cb) {
+        const nav = document.getElementById('navBar');
+        nav.innerHTML = `<div class="back-btn">← Назад</div><div class="breadcrumbs">${label}</div>`;
+        nav.querySelector('.back-btn').onclick = cb;
+    }
+
+    function renderList(items, title) {
+        let html = `<div class="section-title">${title}</div><div class="product-list">`;
+        items.forEach(i => html += getCard(i));
+        html += '</div>';
+        document.getElementById('content').innerHTML = html;
+    }
+
+    function getCard(i) {
+        const q = cart[i.id] || 0;
+        const hasCom = comments[i.id];
+        
+        let btn = q > 0 
+            ? `<div class="counter" onclick="openInput('${i.id}')">
+                 <span class="counter-val">${q}</span>
+                 <span class="counter-unit">${i.unit}</span>
+               </div>`
+            : `<button class="btn-add" onclick="addItem('${i.id}')">Добавить</button>`;
+            
+        let comBtn = q > 0 
+            ? `<button class="btn-msg ${hasCom?'active':''}" onclick="openComment('${i.id}')">💬</button>` 
+            : '';
+
+        return `
+            <div class="product-card" id="card-${i.id}">
+                <div class="prod-info">
+                    <div class="prod-name">${i.name}</div>
+                    <span class="prod-price">${i.price} ₽</span> <span class="prod-unit">/ ${i.unit}</span>
+                </div>
+                <div class="prod-actions">
+                    ${comBtn}
+                    ${btn}
                 </div>
             </div>
         `;
-        return card;
     }
 
-    function getCounterHtml(id, qty, unit) {
-        return `<div class="counter" onclick="event.stopPropagation(); openInputModal('${id}')"><div class="counter-val">${qty}</div><div class="counter-unit">${unit}</div></div>`;
+    // ACTIONS
+    window.addItem = (id) => { cart[id] = 1; updateCard(id); }
+    
+    window.openInput = (id) => {
+        curItem = id;
+        const i = allItems.find(x => x.id == id);
+        document.getElementById('inputName').innerText = i.name;
+        document.getElementById('inputUnit').innerText = i.unit;
+        document.getElementById('sysInput').value = cart[id];
+        openModal('inputModal');
+        setTimeout(() => document.getElementById('sysInput').focus(), 100);
     }
 
-    window.addItem = function(id) {
-        cart[id] = 1;
-        updateUI(id);
-    };
-
-    // === INPUT MODAL (системная клавиатура) ===
-    window.openInputModal = function(id) {
-        currentInputItemId = id;
-        const item = allItems.find(i => i.id === id);
-        
-        document.getElementById('inputProductName').innerText = item.name;
-        document.getElementById('inputUnit').innerText = item.unit;
-        document.getElementById('inputNumber').value = cart[id] || '';
-        document.getElementById('inputModal').classList.add('visible');
-        
-        setTimeout(() => {
-            document.getElementById('inputNumber').focus();
-        }, 300);
-    };
-
-    window.closeInputModal = function() {
-        document.getElementById('inputModal').classList.remove('visible');
-    };
-
-    window.saveInputValue = function() {
-        const val = parseFloat(document.getElementById('inputNumber').value);
-        if (val > 0) {
-            cart[currentInputItemId] = val;
-        } else {
-            delete cart[currentInputItemId];
-            delete comments[currentInputItemId];
-        }
-        updateUI(currentInputItemId);
-        closeInputModal();
-    };
-
-    function updateUI(id) {
-        const item = allItems.find(i => i.id === id);
-        if (!item) return;
-        
-        const card = document.getElementById(`btn-${id}`)?.closest('.product-card');
-        if (card) {
-            const newCard = createProductCard(item);
-            card.replaceWith(newCard);
-        }
-        
-        updateBottomCart();
-        
-        if (currentView === 'home') {
-            const homeCat = document.getElementById('homeCategories');
-            if (homeCat) {
-                homeCat.innerHTML = '';
-                Object.keys(DB).forEach(key => {
-                    homeCat.appendChild(createHomeCategoryCard(key, DB[key]));
-                });
-            }
-        }
+    window.saveInput = () => {
+        const val = parseFloat(document.getElementById('sysInput').value);
+        if(val > 0) cart[curItem] = val;
+        else { delete cart[curItem]; delete comments[curItem]; }
+        updateCard(curItem);
+        closeModal('inputModal');
     }
 
-    function updateBottomCart() {
-        let total = 0;
-        let count = 0;
-        
-        allItems.forEach(i => {
-            if (cart[i.id]) {
-                total += i.price * cart[i.id];
-                count++;
-            }
-        });
+    window.openComment = (id) => {
+        curItem = id;
+        document.getElementById('comName').innerText = allItems.find(x => x.id == id).name;
+        document.getElementById('comText').value = comments[id] || '';
+        openModal('commentModal');
+    }
 
-        const bottom = document.getElementById('bottomCart');
-        const badge = document.getElementById('cartCount');
+    window.saveComment = () => {
+        const val = document.getElementById('comText').value.trim();
+        if(val) comments[curItem] = val; else delete comments[curItem];
+        updateCard(curItem);
+        closeModal('commentModal');
+    }
+
+    function updateCard(id) {
+        const item = allItems.find(x => x.id == id);
+        const card = document.getElementById(`card-${id}`);
+        if(card) card.outerHTML = getCard(item);
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let sum = 0, cnt = 0;
+        allItems.forEach(i => { if(cart[i.id]) { sum += i.price * cart[i.id]; cnt++; } });
         
-        if (count > 0) {
-            bottom.classList.add('visible');
+        const cartEl = document.getElementById('bottomCart');
+        const badge = document.getElementById('cartBadge');
+        
+        if(cnt > 0) {
+            cartEl.classList.add('visible');
             badge.classList.remove('hidden');
-            badge.innerText = count;
-            document.getElementById('bottomTotal').innerText = `${Math.round(total)} ₽`;
-            document.getElementById('bottomCount').innerText = `${count} ${declension(count, ['товар', 'товара', 'товаров'])}`;
+            badge.innerText = cnt;
+            document.getElementById('cartTotal').innerText = Math.round(sum) + ' ₽';
+            document.getElementById('cartDetails').innerText = cnt + ' позиций';
         } else {
-            bottom.classList.remove('visible');
+            cartEl.classList.remove('visible');
             badge.classList.add('hidden');
         }
     }
 
-    function declension(n, forms) {
-        return forms[n%10===1 && n%100!==11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2];
-    }
+    // MODALS
+    window.openModal = (id) => document.getElementById(id).classList.add('visible');
+    window.closeModal = (id) => document.getElementById(id).classList.remove('visible');
 
-    window.openCommentModal = function(id) {
-        currentCommentItemId = id;
-        const item = allItems.find(i => i.id === id);
-        document.getElementById('commentProductName').innerText = item.name;
-        document.getElementById('commentTextarea').value = comments[id] || '';
-        document.getElementById('commentModal').classList.add('visible');
-    };
-
-    window.closeCommentModal = function() {
-        document.getElementById('commentModal').classList.remove('visible');
-    };
-
-    window.saveCommentFromModal = function() {
-        const val = document.getElementById('commentTextarea').value.trim();
-        if (val) {
-            comments[currentCommentItemId] = val;
-        } else {
-            delete comments[currentCommentItemId];
-        }
-        updateUI(currentCommentItemId);
-        closeCommentModal();
-    };
-
-    function updateBreadcrumbs(crumbs) {
-        const c = document.getElementById('breadcrumbs');
-        c.innerHTML = '';
-        crumbs.forEach((crumb, idx) => {
-            const el = document.createElement('span');
-            el.className = `breadcrumb ${crumb.action ? '' : 'active'}`;
-            el.innerText = crumb.name;
-            if (crumb.action) el.onclick = crumb.action;
-            c.appendChild(el);
-            if (idx < crumbs.length - 1) {
-                const sep = document.createElement('span');
-                sep.innerText = '›';
-                c.appendChild(sep);
-            }
-        });
-    }
-
-    function renderAlphabetIndex(letters) {
-        const idx = document.getElementById('alphabetIndex');
-        idx.innerHTML = '';
-        idx.classList.remove('hidden');
-        
-        letters.forEach(l => {
-            const el = document.createElement('div');
-            el.className = 'alphabet-letter';
-            el.innerText = l;
-            el.onclick = () => {
-                document.getElementById(`letter-${l}`).scrollIntoView({behavior: 'smooth'});
-            };
-            idx.appendChild(el);
-        });
-    }
-
+    // SEARCH
     function setupSearch() {
-        const input = document.getElementById('search');
+        const inp = document.getElementById('search');
         const auto = document.getElementById('autocomplete');
         
-        input.addEventListener('input', (e) => {
+        inp.oninput = (e) => {
             const val = e.target.value.trim();
+            if(val.length < 2) { auto.classList.remove('visible'); return; }
             
-            if (val.length < 2) {
-                auto.classList.remove('visible');
-                return;
-            }
-
-            const results = fuse.search(val).slice(0, 5);
+            const res = fuse.search(val).slice(0, 5);
+            if(!res.length) { auto.classList.remove('visible'); return; }
             
-            if (results.length === 0) {
-                auto.classList.remove('visible');
-                return;
-            }
-
-            auto.innerHTML = '';
-            results.forEach(res => {
-                const item = res.item;
-                const el = document.createElement('div');
-                el.className = 'autocomplete-item';
-                el.innerHTML = `
-                    <span>${item.name}</span>
-                    <span style="color: var(--accent); font-weight: 700;">${item.price}₽</span>
-                `;
-                el.onclick = () => {
-                    addItem(item.id);
-                    input.value = '';
-                    auto.classList.remove('visible');
-                };
-                auto.appendChild(el);
-            });
-            
+            auto.innerHTML = res.map(r => `
+                <div class="autocomplete-item" onclick="addItem('${r.item.id}'); document.getElementById('search').value=''; document.getElementById('autocomplete').classList.remove('visible');">
+                    <span>${r.item.name}</span>
+                    <span style="color:var(--accent); font-weight:700;">${r.item.price}₽</span>
+                </div>
+            `).join('');
             auto.classList.add('visible');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !auto.contains(e.target)) {
-                auto.classList.remove('visible');
-            }
-        });
-    }
-
-    function setupFilters() {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                priceFilter = btn.dataset.filter;
-                
-                if (currentView === 'subcategory') {
-                    renderSubcategory(currentCat, currentSub);
-                } else if (currentView === 'category' && !DB[currentCat].subs) {
-                    renderCategory(currentCat);
-                }
-            });
-        });
-    }
-
-    function filterByPrice(items) {
-        if (priceFilter === 'all') return items;
-        if (priceFilter === 'cheap') return items.filter(i => i.price < 100);
-        if (priceFilter === 'mid') return items.filter(i => i.price >= 100 && i.price < 500);
-        if (priceFilter === 'expensive') return items.filter(i => i.price >= 500);
-        return items;
-    }
-
-    window.openCartModal = function() {
-        if (Object.keys(cart).length === 0) return;
-        openOrderModal();
-    };
-
-    window.openOrderModal = function() {
-        const summary = document.getElementById('orderSummary');
-        summary.innerHTML = '';
-        
-        allItems.forEach(i => {
-            if (cart[i.id]) {
-                const row = document.createElement('div');
-                row.className = 'order-item';
-                const note = comments[i.id] ? `<div class="order-note">💬 ${comments[i.id]}</div>` : '';
-                row.innerHTML = `
-                    <div>
-                        <div style="font-weight:600;">${i.name}</div>
-                        ${note}
-                    </div>
-                    <div style="white-space:nowrap; font-weight:700;">${cart[i.id]} ${i.unit}</div>
-                `;
-                summary.appendChild(row);
-            }
-        });
-
-        document.getElementById('orderModal').classList.add('visible');
-    };
-
-    window.closeOrderModal = function() {
-        document.getElementById('orderModal').classList.remove('visible');
-    };
-
-    window.sendOrder = function() {
-        let total = 0;
-        allItems.forEach(i => { if(cart[i.id]) total += i.price * cart[i.id]; });
-        
-        const data = {
-            cart: cart,
-            comments: comments,
-            global_comment: document.getElementById('globalComment').value,
-            total_price: `${Math.round(total)} ₽`
         };
-        tg.sendData(JSON.stringify(data));
-    };
+        
+        document.onclick = (e) => { if(e.target != inp) auto.classList.remove('visible'); }
+    }
+
+    // ORDER
+    window.openOrder = () => {
+        let html = '';
+        allItems.forEach(i => {
+            if(cart[i.id]) {
+                const com = comments[i.id] ? `<div style="font-size:12px; color:#8e8e93; margin-top:2px;">💬 ${comments[i.id]}</div>` : '';
+                html += `
+                    <div style="border-bottom:1px solid #333; padding:10px 0; display:flex; justify-content:space-between;">
+                        <div><div style="font-weight:600; font-size:14px;">${i.name}</div>${com}</div>
+                        <div style="font-weight:700; white-space:nowrap;">${cart[i.id]} ${i.unit}</div>
+                    </div>
+                `;
+            }
+        });
+        document.getElementById('orderList').innerHTML = html;
+        openModal('orderModal');
+    }
+
+    window.openCart = () => { if(Object.keys(cart).length) openOrder(); }
+
+    window.sendData = () => {
+        let sum = 0;
+        allItems.forEach(i => { if(cart[i.id]) sum += i.price * cart[i.id]; });
+        tg.sendData(JSON.stringify({ 
+            cart, comments, 
+            total: Math.round(sum) + ' ₽',
+            global_comment: document.getElementById('globalCom').value 
+        }));
+    }
 
     init();
 </script>
